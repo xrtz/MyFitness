@@ -41,7 +41,7 @@ fun TypeOfMealView(name: String, dayFoodItem: DayFoodItemModel, type: Int) {
         Row(modifier = Modifier
             .fillMaxWidth()
             .background(color = Color.White)
-            .padding(4.dp),
+            .padding(5.dp),
           horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
 
