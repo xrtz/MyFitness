@@ -9,14 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myfitness.MyFitnessApp
 import com.example.myfitness.di.ViewModelFactory
-import com.example.myfitness.presentation.navigation.Navigation
+import com.example.myfitness.presentation.screens.AuthScreen
 import com.example.myfitness.ui.theme.MyFitnessTheme
-import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Inject
 
-class MainActivity : ComponentActivity() {
+class AuthActivity : ComponentActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -25,23 +25,22 @@ class MainActivity : ComponentActivity() {
         (application as MyFitnessApp).appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
-        // Если не авторизован — отправляем на AuthActivity
-        if (FirebaseAuth.getInstance().currentUser == null) {
-            startActivity(Intent(this, AuthActivity::class.java))
-            finish()
-            return
-        }
-
         enableEdgeToEdge()
         setContent {
             MyFitnessTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Navigation(
+                    AuthScreen(
                         modifier         = Modifier.padding(innerPadding),
-                        viewModelFactory = viewModelFactory
+                        viewModelFactory = viewModelFactory,
+                        onAuthSuccess    = { goToMain() }
                     )
                 }
             }
         }
+    }
+
+    private fun goToMain() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish() // закрываем AuthActivity чтобы нельзя было вернуться назад
     }
 }

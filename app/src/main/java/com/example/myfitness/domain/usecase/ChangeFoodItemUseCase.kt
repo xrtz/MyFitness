@@ -1,15 +1,15 @@
 package com.example.myfitness.domain.usecase
 
-import com.example.myfitness.data.repository.FoodRepositoryImpl
-import com.example.myfitness.domain.models.DateModel
 import com.example.myfitness.domain.models.DayFoodItemModel
 import com.example.myfitness.domain.models.FoodModel
 import com.example.myfitness.domain.models.RepositoryResult
+import com.example.myfitness.domain.repository.FoodRepository
+import javax.inject.Inject
 
-class ChangeFoodItemUseCase {
+class ChangeFoodItemUseCase @Inject constructor(
+    private val repository: FoodRepository
+) {
     fun execute(food: FoodModel, day: DayFoodItemModel): RepositoryResult {
-        val repo = FoodRepositoryImpl() // DI
-
         val foodOld = when (food.typeOfMeal) {
             "breakfast" -> day.breakfast.find { it.id == food.id }
             "lunch" -> day.lunch.find { it.id == food.id }
@@ -21,22 +21,10 @@ class ChangeFoodItemUseCase {
             return RepositoryResult.Error(Exception("Food item with id ${food.id} not found in ${food.typeOfMeal}"))
         }
 
-        val updatedBreakfast = when (food.typeOfMeal) {
-            "breakfast" -> updateList(day.breakfast, foodOld, food)
-            else -> day.breakfast
-        }
-        val updatedLunch = when (food.typeOfMeal) {
-            "lunch" -> updateList(day.lunch, foodOld, food)
-            else -> day.lunch
-        }
-        val updatedDinner = when (food.typeOfMeal) {
-            "dinner" -> updateList(day.dinner, foodOld, food)
-            else -> day.dinner
-        }
-        val updatedSnacks = when (food.typeOfMeal) {
-            "snacks" -> updateList(day.snacks, foodOld, food)
-            else -> day.snacks
-        }
+        val updatedBreakfast = if (food.typeOfMeal == "breakfast") updateList(day.breakfast, foodOld, food) else day.breakfast
+        val updatedLunch = if (food.typeOfMeal == "lunch") updateList(day.lunch, foodOld, food) else day.lunch
+        val updatedDinner = if (food.typeOfMeal == "dinner") updateList(day.dinner, foodOld, food) else day.dinner
+        val updatedSnacks = if (food.typeOfMeal == "snacks") updateList(day.snacks, foodOld, food) else day.snacks
 
         val dayCopy = day.copy(
             calories = day.calories + food.calories - foodOld.calories,
@@ -49,7 +37,7 @@ class ChangeFoodItemUseCase {
             snacks = updatedSnacks
         )
 
-        return repo.updateDayFoodItems(dayCopy)
+        return repository.updateDayFoodItems(dayCopy)
     }
 
     private fun updateList(

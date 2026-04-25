@@ -1,53 +1,36 @@
 package com.example.myfitness.domain.usecase
 
-import com.example.myfitness.data.repository.FoodRepositoryImpl
-import com.example.myfitness.domain.models.DateModel
 import com.example.myfitness.domain.models.DayFoodItemModel
 import com.example.myfitness.domain.models.FoodModel
 import com.example.myfitness.domain.models.RepositoryResult
+import com.example.myfitness.domain.repository.FoodRepository
+import javax.inject.Inject
 
-class DeleteFoodItemUseCase {
+class DeleteFoodItemUseCase @Inject constructor(
+    private val repository: FoodRepository
+) {
     fun execute(food: FoodModel, day: DayFoodItemModel): RepositoryResult {
-        val repo = FoodRepositoryImpl() // DI
+        // filter — правильный способ удалить элемент из списка
+        val updatedBreakfast = if (food.typeOfMeal == "breakfast") day.breakfast.filter { it.id != food.id } else day.breakfast
+        val updatedLunch     = if (food.typeOfMeal == "lunch")     day.lunch.filter     { it.id != food.id } else day.lunch
+        val updatedDinner    = if (food.typeOfMeal == "dinner")    day.dinner.filter    { it.id != food.id } else day.dinner
+        val updatedSnacks    = if (food.typeOfMeal == "snacks")    day.snacks.filter    { it.id != food.id } else day.snacks
 
-        val updatedBreakfast = when (food.typeOfMeal) {
-            "breakfast" -> updateList(day.breakfast, food)
-            else -> day.breakfast
-        }
-
-        val updatedLunch = when (food.typeOfMeal) {
-            "lunch" -> updateList(day.lunch, food)
-            else -> day.lunch
-        }
-
-        val updatedDinner = when (food.typeOfMeal) {
-            "dinner" -> updateList(day.dinner, food)
-            else -> day.dinner
-        }
-
-        val updatedSnacks = when (food.typeOfMeal) {
-            "snacks" -> updateList(day.snacks, food)
-            else -> day.snacks
-        }
+        // Пересчитываем БЖУ с нуля по оставшимся продуктам — не вычитаем из старого,
+        // чтобы избежать накопления ошибок при множественных удалениях
+        val allRemaining = updatedBreakfast + updatedLunch + updatedDinner + updatedSnacks
 
         val dayCopy = day.copy(
-            calories = day.calories - food.calories,
-            protein = day.protein - food.protein,
-            fats = day.fats - food.fats,
-            carbohydrates = day.carbohydrates - food.carbohydrates,
-            breakfast = updatedBreakfast,
-            lunch = updatedLunch,
-            dinner = updatedDinner,
-            snacks = updatedSnacks
+            calories      = allRemaining.sumOf { it.calories }.toFloat(),
+            protein       = allRemaining.sumOf { it.protein.toDouble() }.toFloat(),
+            fats          = allRemaining.sumOf { it.fats.toDouble() }.toFloat(),
+            carbohydrates = allRemaining.sumOf { it.carbohydrates.toDouble() }.toFloat(),
+            breakfast     = updatedBreakfast,
+            lunch         = updatedLunch,
+            dinner        = updatedDinner,
+            snacks        = updatedSnacks
         )
 
-        return repo.updateDayFoodItems(dayCopy)
-    }
-
-    private fun updateList(list: List<FoodModel>, oldItem: FoodModel): List<FoodModel> {
-        val index = list.indexOfFirst { it.id == oldItem.id }
-        return if (index != -1) {
-            list.toMutableList().apply { this.minusElement(oldItem)}
-        } else list
+        return repository.updateDayFoodItems(dayCopy)
     }
 }
