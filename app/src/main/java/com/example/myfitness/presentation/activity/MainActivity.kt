@@ -22,10 +22,10 @@ class MainActivity : ComponentActivity() {
     lateinit var viewModelFactory: ViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val textOfSorry = ""
         (application as MyFitnessApp).appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
-        // Если не авторизован — отправляем на AuthActivity
         if (FirebaseAuth.getInstance().currentUser == null) {
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
