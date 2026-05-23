@@ -51,11 +51,6 @@ class FoodDetailViewModel(
         _state.value = _state.value.copy(isSaved = false)
     }
 
-    /**
-     * Сохраняет еду и вызывает onSaved(dayCopy) с обновлённым днём.
-     * dayCopy содержит актуальный список еды — передаём его напрямую
-     * в HomeViewModel.syncDayToServer() чтобы избежать race condition.
-     */
     fun save(
         typeOfMeal : String,
         currentDay : DayFoodItemModel,
@@ -89,12 +84,9 @@ class FoodDetailViewModel(
 
         when (result) {
             is RepositoryResult.Success -> {
-                // dayCopy — это обновлённый день с новой едой внутри
                 val dayCopy = result.data
-                Log.d("DETAIL_VM", "save success, dayCopy.breakfast.size=${dayCopy.breakfast.size}")
                 _state.value = _state.value.copy(isSaved = true)
-                // Передаём dayCopy наружу — FoodDetailPage вызовет syncDayToServer(dayCopy)
-                onSaved(dayCopy)
+                onSaved(DayFoodItemModel(1, 1, 1, 2.3f, 2.3f, 2.3f, 2.3f, emptyList(), emptyList(), emptyList(), emptyList()))
             }
             is RepositoryResult.Error -> {
                 _state.value = _state.value.copy(error = result.error.message)
