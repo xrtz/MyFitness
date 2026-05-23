@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.myfitness.MyFitnessApp
+import com.example.myfitness.data.remote.TokenProvider
 import com.example.myfitness.di.ViewModelFactory
 import com.example.myfitness.presentation.navigation.Navigation
 import com.example.myfitness.ui.theme.MyFitnessTheme
-import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
@@ -22,11 +22,10 @@ class MainActivity : ComponentActivity() {
     lateinit var viewModelFactory: ViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val textOfSorry = ""
         (application as MyFitnessApp).appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
-        if (FirebaseAuth.getInstance().currentUser == null) {
+        if (TokenProvider.token == null) {
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
             return

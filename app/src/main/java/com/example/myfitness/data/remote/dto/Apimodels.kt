@@ -2,6 +2,26 @@ package com.example.myfitness.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
+data class RegisterRequest(
+    @SerializedName("name")     val name     : String,
+    @SerializedName("email")    val email    : String,
+    @SerializedName("password") val password : String,
+    @SerializedName("gender")   val gender   : Int    = 0,
+    @SerializedName("weight")   val weight   : Float  = 0f,
+    @SerializedName("height")   val height   : Float  = 0f,
+    @SerializedName("target")   val target   : String = ""
+)
+
+data class LoginRequest(
+    @SerializedName("email")    val email    : String,
+    @SerializedName("password") val password : String
+)
+
+data class AuthResponse(
+    @SerializedName("token") val token : String,
+    @SerializedName("user")  val user  : UserResponse
+)
+
 data class UserRequest(
     @SerializedName("name")   val name   : String,
     @SerializedName("gender") val gender : Int,

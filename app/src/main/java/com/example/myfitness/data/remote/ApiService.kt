@@ -1,7 +1,10 @@
 package com.example.myfitness.data.remote
 
+import com.example.myfitness.data.remote.dto.AuthResponse
 import com.example.myfitness.data.remote.dto.DayFoodRequest
 import com.example.myfitness.data.remote.dto.DayFoodResponse
+import com.example.myfitness.data.remote.dto.LoginRequest
+import com.example.myfitness.data.remote.dto.RegisterRequest
 import com.example.myfitness.data.remote.dto.UserRequest
 import com.example.myfitness.data.remote.dto.UserResponse
 import retrofit2.Response
@@ -9,7 +12,10 @@ import retrofit2.http.*
 
 interface ApiService {
     @POST("api/auth/register")
-    suspend fun register(@Body request: UserRequest): Response<UserResponse>
+    suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
+
+    @POST("api/auth/login")
+    suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
 
     @GET("api/users/me")
     suspend fun getMe(): Response<UserResponse>

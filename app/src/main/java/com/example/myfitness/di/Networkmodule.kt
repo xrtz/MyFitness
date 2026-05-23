@@ -14,7 +14,7 @@ import javax.inject.Singleton
 class NetworkModule {
 
     companion object {
-        const val BASE_URL = "http://192.168.31.187:8080/"
+        const val BASE_URL = "http://172.20.10.2:8080/"
     }
 
     @Provides
@@ -28,7 +28,7 @@ class NetworkModule {
             level = HttpLoggingInterceptor.Level.BODY
         }
         return OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)   // добавляет JWT
+            .addInterceptor(authInterceptor)
             .addInterceptor(logging)
             .build()
     }
