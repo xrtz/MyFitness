@@ -150,7 +150,6 @@ fun FoodDetailPage(
                             onSaved    = { dayCopy ->
                                 Log.d("DETAIL_PAGE", "onSaved: dayCopy.breakfast=${dayCopy.breakfast.size}")
                                 homeViewModel.syncDayToServer(dayCopy)
-                                onBack()
                             }
                         )
                     }

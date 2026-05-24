@@ -84,9 +84,23 @@ class FoodDetailViewModel(
 
         when (result) {
             is RepositoryResult.Success -> {
-                val dayCopy = result.data
+                val updatedBreakfast = if (typeOfMeal == "breakfast") currentDay.breakfast + food else currentDay.breakfast
+                val updatedLunch     = if (typeOfMeal == "lunch")     currentDay.lunch     + food else currentDay.lunch
+                val updatedDinner    = if (typeOfMeal == "dinner")    currentDay.dinner    + food else currentDay.dinner
+                val updatedSnacks    = if (typeOfMeal == "snacks")    currentDay.snacks    + food else currentDay.snacks
+                val allItems = updatedBreakfast + updatedLunch + updatedDinner + updatedSnacks
+                val dayCopy = currentDay.copy(
+                    calories      = allItems.sumOf { it.calories.toDouble() }.toFloat(),
+                    protein       = allItems.sumOf { it.protein.toDouble() }.toFloat(),
+                    fats          = allItems.sumOf { it.fats.toDouble() }.toFloat(),
+                    carbohydrates = allItems.sumOf { it.carbohydrates.toDouble() }.toFloat(),
+                    breakfast     = updatedBreakfast,
+                    lunch         = updatedLunch,
+                    dinner        = updatedDinner,
+                    snacks        = updatedSnacks
+                )
                 _state.value = _state.value.copy(isSaved = true)
-                onSaved(DayFoodItemModel(1, 1, 1, 2.3f, 2.3f, 2.3f, 2.3f, emptyList(), emptyList(), emptyList(), emptyList()))
+                onSaved(dayCopy)
             }
             is RepositoryResult.Error -> {
                 _state.value = _state.value.copy(error = result.error.message)
