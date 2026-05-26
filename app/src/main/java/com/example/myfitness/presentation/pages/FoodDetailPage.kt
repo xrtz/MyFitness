@@ -48,6 +48,17 @@ fun FoodDetailPage(
 
     Log.d("DETAIL_PAGE", "selectedDate=$selectedDate dayFoodItem.date=${dayFoodItem?.date}")
 
+    LaunchedEffect(foodId) {
+        if (foodId != null) {
+            val food = dayFoodItem?.let { day ->
+                (day.breakfast + day.lunch + day.dinner + day.snacks).find { it.id == foodId }
+            }
+            food?.let { foodDetailViewModel.loadFood(it) }
+        } else {
+            foodDetailViewModel.resetForm()
+        }
+    }
+
     LaunchedEffect(detailState.isSaved) {
         if (detailState.isSaved) {
             foodDetailViewModel.resetSaved()

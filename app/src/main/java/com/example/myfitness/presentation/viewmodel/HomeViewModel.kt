@@ -170,6 +170,26 @@ class HomeViewModel(
         fats = fats,
         carbohydrates = carbohydrates
     )
+    fun deleteFood(food: FoodModel, day: DayFoodItemModel) {
+        val updatedBreakfast = if (food.typeOfMeal == "breakfast") day.breakfast.filter { it.id != food.id } else day.breakfast
+        val updatedLunch     = if (food.typeOfMeal == "lunch")     day.lunch.filter     { it.id != food.id } else day.lunch
+        val updatedDinner    = if (food.typeOfMeal == "dinner")    day.dinner.filter    { it.id != food.id } else day.dinner
+        val updatedSnacks    = if (food.typeOfMeal == "snacks")    day.snacks.filter    { it.id != food.id } else day.snacks
+        val allRemaining     = updatedBreakfast + updatedLunch + updatedDinner + updatedSnacks
+        val updatedDay = day.copy(
+            calories      = allRemaining.sumOf { it.calories }.toFloat(),
+            protein       = allRemaining.sumOf { it.protein.toDouble() }.toFloat(),
+            fats          = allRemaining.sumOf { it.fats.toDouble() }.toFloat(),
+            carbohydrates = allRemaining.sumOf { it.carbohydrates.toDouble() }.toFloat(),
+            breakfast     = updatedBreakfast,
+            lunch         = updatedLunch,
+            dinner        = updatedDinner,
+            snacks        = updatedSnacks
+        )
+        _dayFoodItem.value = updatedDay
+        syncDayToServer(updatedDay)
+    }
+
     fun getStartOfWeek(date: LocalDate): LocalDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
 
     private fun FoodModel.toDto() = FoodItemDto(

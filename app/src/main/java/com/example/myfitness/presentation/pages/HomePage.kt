@@ -52,7 +52,7 @@ fun HomePage(
                 selectedDate  = selectedDate,
                 onAddClick    = { navController.navigate("food_detail/breakfast") },
                 onEditClick   = { food -> navController.navigate("food_detail/breakfast?foodId=${food.id}") },
-                onDeleteClick = {  }
+                onDeleteClick = { food -> homeViewModel.deleteFood(food, day) }
             )
 
             TypeOfMealView(
@@ -62,7 +62,7 @@ fun HomePage(
                 selectedDate  = selectedDate,
                 onAddClick    = { navController.navigate("food_detail/lunch") },
                 onEditClick   = { food -> navController.navigate("food_detail/lunch?foodId=${food.id}") },
-                onDeleteClick = {}
+                onDeleteClick = { food -> homeViewModel.deleteFood(food, day) }
             )
 
             TypeOfMealView(
@@ -72,7 +72,7 @@ fun HomePage(
                 selectedDate  = selectedDate,
                 onAddClick    = { navController.navigate("food_detail/dinner") },
                 onEditClick   = { food -> navController.navigate("food_detail/dinner?foodId=${food.id}") },
-                onDeleteClick = {  }
+                onDeleteClick = { food -> homeViewModel.deleteFood(food, day) }
             )
 
             TypeOfMealView(
@@ -82,7 +82,7 @@ fun HomePage(
                 selectedDate  = selectedDate,
                 onAddClick    = { navController.navigate("food_detail/snacks") },
                 onEditClick   = { food -> navController.navigate("food_detail/snacks?foodId=${food.id}") },
-                onDeleteClick = {  }
+                onDeleteClick = { food -> homeViewModel.deleteFood(food, day) }
             )
         }
     }

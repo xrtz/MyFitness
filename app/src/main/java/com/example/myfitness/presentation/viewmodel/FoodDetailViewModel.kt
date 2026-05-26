@@ -51,6 +51,10 @@ class FoodDetailViewModel(
         _state.value = _state.value.copy(isSaved = false)
     }
 
+    fun resetForm() {
+        _state.value = FoodDetailState()
+    }
+
     fun save(
         typeOfMeal : String,
         currentDay : DayFoodItemModel,
@@ -84,10 +88,26 @@ class FoodDetailViewModel(
 
         when (result) {
             is RepositoryResult.Success -> {
-                val updatedBreakfast = if (typeOfMeal == "breakfast") currentDay.breakfast + food else currentDay.breakfast
-                val updatedLunch     = if (typeOfMeal == "lunch")     currentDay.lunch     + food else currentDay.lunch
-                val updatedDinner    = if (typeOfMeal == "dinner")    currentDay.dinner    + food else currentDay.dinner
-                val updatedSnacks    = if (typeOfMeal == "snacks")    currentDay.snacks    + food else currentDay.snacks
+                val updatedBreakfast = when {
+                    typeOfMeal != "breakfast" -> currentDay.breakfast
+                    foodId != null -> currentDay.breakfast.map { if (it.id == foodId) food else it }
+                    else -> currentDay.breakfast + food
+                }
+                val updatedLunch = when {
+                    typeOfMeal != "lunch" -> currentDay.lunch
+                    foodId != null -> currentDay.lunch.map { if (it.id == foodId) food else it }
+                    else -> currentDay.lunch + food
+                }
+                val updatedDinner = when {
+                    typeOfMeal != "dinner" -> currentDay.dinner
+                    foodId != null -> currentDay.dinner.map { if (it.id == foodId) food else it }
+                    else -> currentDay.dinner + food
+                }
+                val updatedSnacks = when {
+                    typeOfMeal != "snacks" -> currentDay.snacks
+                    foodId != null -> currentDay.snacks.map { if (it.id == foodId) food else it }
+                    else -> currentDay.snacks + food
+                }
                 val allItems = updatedBreakfast + updatedLunch + updatedDinner + updatedSnacks
                 val dayCopy = currentDay.copy(
                     calories      = allItems.sumOf { it.calories.toDouble() }.toFloat(),
