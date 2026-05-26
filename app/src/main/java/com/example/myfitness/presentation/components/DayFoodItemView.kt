@@ -13,6 +13,7 @@ import com.example.myfitness.domain.models.FoodModel
 @Composable
 fun DayFoodItemView(
     dayFoodItem: DayFoodItemModel,
+    caloriesGoal: Float = 2000f,
     onAddClick: (typeOfMeal: String) -> Unit,
     onEditClick: (FoodModel) -> Unit,
     onDeleteClick: (FoodModel) -> Unit
@@ -22,6 +23,6 @@ fun DayFoodItemView(
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
-        DayInfoView(dayFoodItem = dayFoodItem)
+        DayInfoView(dayFoodItem = dayFoodItem, caloriesGoal = caloriesGoal)
     }
 }

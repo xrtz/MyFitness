@@ -13,13 +13,22 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,14 +38,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myfitness.di.ViewModelFactory
 import com.example.myfitness.presentation.viewmodel.ProfileViewModel
 
+private val TARGET_OPTIONS = listOf("похудение", "поддержание", "набор")
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfilePage(
     modifier         : Modifier = Modifier,
-    viewModelFactory : ViewModelFactory          // передаём factory как параметр
+    viewModelFactory : ViewModelFactory,
+    onSaved          : () -> Unit = {}
 ) {
-    // ProfileViewModel создаётся через factory — там есть ApiService
     val viewModel: ProfileViewModel = viewModel(factory = viewModelFactory)
     val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(state.isSaved) {
+        if (state.isSaved) onSaved()
+    }
+
+    var targetExpanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -92,12 +110,36 @@ fun ProfilePage(
             modifier        = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
-            value         = state.target,
-            onValueChange = viewModel::onTargetChange,
-            label         = { Text("Цель (похудение / набор / поддержание)") },
-            modifier      = Modifier.fillMaxWidth()
-        )
+        ExposedDropdownMenuBox(
+            expanded          = targetExpanded,
+            onExpandedChange  = { targetExpanded = it },
+            modifier          = Modifier.fillMaxWidth()
+        ) {
+            OutlinedTextField(
+                value         = state.target.ifEmpty { "Выберите цель" },
+                onValueChange = {},
+                readOnly      = true,
+                label         = { Text("Цель") },
+                trailingIcon  = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = targetExpanded) },
+                modifier      = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
+            )
+            ExposedDropdownMenu(
+                expanded         = targetExpanded,
+                onDismissRequest = { targetExpanded = false }
+            ) {
+                TARGET_OPTIONS.forEach { option ->
+                    DropdownMenuItem(
+                        text    = { Text(option) },
+                        onClick = {
+                            viewModel.onTargetChange(option)
+                            targetExpanded = false
+                        }
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 

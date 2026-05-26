@@ -25,8 +25,9 @@ fun HomePage(
     navController : NavController,
     homeViewModel : HomeViewModel
 ) {
-    val selectedDate by homeViewModel.selectedDate.collectAsState()
-    val dayFoodItem  by homeViewModel.dayFoodItem.collectAsState()
+    val selectedDate  by homeViewModel.selectedDate.collectAsState()
+    val dayFoodItem   by homeViewModel.dayFoodItem.collectAsState()
+    val caloriesGoal  by homeViewModel.caloriesGoal.collectAsState()
 
     Column(
         modifier = modifier
@@ -42,7 +43,7 @@ fun HomePage(
         )
 
         dayFoodItem?.let { day ->
-            DayInfoView(dayFoodItem = day)
+            DayInfoView(dayFoodItem = day, caloriesGoal = caloriesGoal)
 
             TypeOfMealView(
                 name          = stringResource(R.string.breakfast),

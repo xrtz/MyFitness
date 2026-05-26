@@ -59,7 +59,8 @@ fun HomeScreen(
             )
             1 -> ProfilePage(
                 modifier         = modifier.padding(innerPadding),
-                viewModelFactory = viewModelFactory   // передаём factory
+                viewModelFactory = viewModelFactory,
+                onSaved          = { homeViewModel.loadUserGoal() }
             )
         }
     }

@@ -34,6 +34,9 @@ class HomeViewModel(
     private val _dayFoodItem = MutableStateFlow<DayFoodItemModel?>(null)
     val dayFoodItem: StateFlow<DayFoodItemModel?> = _dayFoodItem
 
+    private val _caloriesGoal = MutableStateFlow(2000f)
+    val caloriesGoal: StateFlow<Float> = _caloriesGoal
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -42,6 +45,29 @@ class HomeViewModel(
 
     init {
         loadDay(LocalDate.now())
+        loadUserGoal()
+    }
+
+    fun loadUserGoal() {
+        viewModelScope.launch {
+            try {
+                val response = apiService.getMe()
+                if (response.isSuccessful) {
+                    val user = response.body() ?: return@launch
+                    val bmr = Util.howMuchNeedCalories(
+                        weight = user.weight.coerceAtLeast(1f),
+                        height = user.height.coerceAtLeast(1f),
+                        age    = 25,
+                        gender = user.gender
+                    )
+                    _caloriesGoal.value = when {
+                        user.target.contains("похудение", ignoreCase = true) -> bmr - 500f
+                        user.target.contains("набор",     ignoreCase = true) -> bmr + 300f
+                        else                                                  -> bmr
+                    }.coerceAtLeast(1200f)
+                }
+            } catch (_: Exception) { }
+        }
     }
 
     fun selectDate(date: LocalDate) {
