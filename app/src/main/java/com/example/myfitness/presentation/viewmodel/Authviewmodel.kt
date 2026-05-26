@@ -36,7 +36,8 @@ class AuthViewModel(
                 val response = apiService.login(LoginRequest(email, password))
                 when {
                     response.isSuccessful -> {
-                        TokenProvider.save(response.body()!!.token)
+                        val body = response.body()!!
+                        TokenProvider.save(body.token, body.user.firebaseUid)
                         Log.d("AUTH_VM", "Login OK")
                         _state.value = AuthState.Success
                     }
@@ -81,7 +82,8 @@ class AuthViewModel(
                 )
                 when {
                     response.isSuccessful -> {
-                        TokenProvider.save(response.body()!!.token)
+                        val body = response.body()!!
+                        TokenProvider.save(body.token, body.user.firebaseUid)
                         Log.d("AUTH_VM", "Register OK")
                         _state.value = AuthState.Success
                     }

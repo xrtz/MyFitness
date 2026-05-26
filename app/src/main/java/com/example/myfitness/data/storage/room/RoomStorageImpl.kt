@@ -1,6 +1,7 @@
 package com.example.myfitness.data.storage.room
 
 import android.util.Log
+import com.example.myfitness.data.remote.TokenProvider
 import com.example.myfitness.data.storage.Storage
 import com.example.myfitness.data.storage.room.dao.FoodDao
 import com.example.myfitness.data.storage.room.dao.UserDao
@@ -19,9 +20,12 @@ class RoomStorageImpl @Inject constructor(
     private val userDao : UserDao
 ) : Storage {
 
+    private fun currentUserKey() = TokenProvider.userId ?: ""
+
     override fun getDayFoodItems(date: DateModel): DayFoodItemModel {
-        Log.d("ROOM", "getDayFoodItems date=${date.day}")
-        val dayEntity = foodDao.getDayFood(date.day) ?: return emptyDay(date.day)
+        val userKey = currentUserKey()
+        Log.d("ROOM", "getDayFoodItems date=${date.day} userKey=$userKey")
+        val dayEntity = foodDao.getDayFood(date.day, userKey) ?: return emptyDay(date.day)
         val allFood   = foodDao.getFoodByDay(dayEntity.id)
         Log.d("ROOM", "found day id=${dayEntity.id}, foods=${allFood.size}")
 
@@ -41,15 +45,17 @@ class RoomStorageImpl @Inject constructor(
     }
 
     override fun updateDayFoodItems(day: DayFoodItemModel): RepositoryResult {
+        val userKey = currentUserKey()
         return try {
-            Log.d("ROOM", "updateDayFoodItems day.date=${day.date} day.id=${day.id}")
+            Log.d("ROOM", "updateDayFoodItems day.date=${day.date} day.id=${day.id} userKey=$userKey")
 
-            val existingDay = foodDao.getDayFood(day.date)
+            val existingDay = foodDao.getDayFood(day.date, userKey)
 
             val resolvedDayId: Int = if (existingDay == null) {
                 val newEntity = DayFoodEntity(
                     id            = 0,
                     userId        = day.userId,
+                    userKey       = userKey,
                     date          = day.date,
                     calories      = day.calories,
                     protein       = day.protein,
@@ -65,7 +71,8 @@ class RoomStorageImpl @Inject constructor(
                         calories      = day.calories,
                         protein       = day.protein,
                         fats          = day.fats,
-                        carbohydrates = day.carbohydrates
+                        carbohydrates = day.carbohydrates,
+                        userKey       = userKey
                     )
                 )
                 Log.d("ROOM", "Updated existing day, id=${existingDay.id}")

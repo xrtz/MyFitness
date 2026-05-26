@@ -12,13 +12,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
@@ -45,7 +48,8 @@ private val TARGET_OPTIONS = listOf("похудение", "поддержани�
 fun ProfilePage(
     modifier         : Modifier = Modifier,
     viewModelFactory : ViewModelFactory,
-    onSaved          : () -> Unit = {}
+    onSaved          : () -> Unit = {},
+    onLogout         : () -> Unit = {}
 ) {
     val viewModel: ProfileViewModel = viewModel(factory = viewModelFactory)
     val state by viewModel.state.collectAsState()
@@ -158,5 +162,17 @@ fun ProfilePage(
             Snackbar { Text("Профиль сохранён") }
         }
         state.error?.let { Snackbar { Text(it) } }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(
+            onClick  = onLogout,
+            modifier = Modifier.fillMaxWidth(),
+            colors   = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.error
+            )
+        ) {
+            Text("Выйти из аккаунта")
+        }
     }
 }

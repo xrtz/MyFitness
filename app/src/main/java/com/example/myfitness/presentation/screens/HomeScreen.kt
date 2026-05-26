@@ -29,7 +29,8 @@ fun HomeScreen(
     modifier         : Modifier = Modifier,
     navController    : NavController,
     homeViewModel    : HomeViewModel,
-    viewModelFactory : ViewModelFactory          // нужен для ProfilePage
+    viewModelFactory : ViewModelFactory,
+    onLogout         : () -> Unit = {}
 ) {
     val navItemList = listOf(
         NavItem(stringResource(R.string.label_nav_home),    Icons.Default.Home),
@@ -60,7 +61,8 @@ fun HomeScreen(
             1 -> ProfilePage(
                 modifier         = modifier.padding(innerPadding),
                 viewModelFactory = viewModelFactory,
-                onSaved          = { homeViewModel.loadUserGoal() }
+                onSaved          = { homeViewModel.loadUserGoal() },
+                onLogout         = onLogout
             )
         }
     }

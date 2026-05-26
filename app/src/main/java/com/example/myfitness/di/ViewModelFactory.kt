@@ -29,7 +29,8 @@ class ViewModelFactory @Inject constructor(
                 getDayFoodItemUseCase = GetDayFoodItemUseCase(foodRepository),
                 addFoodItemUseCase    = AddFoodItemUseCase(foodRepository),
                 deleteFoodItemUseCase = DeleteFoodItemUseCase(foodRepository),
-                apiService            = apiService
+                apiService            = apiService,
+                foodRepository        = foodRepository
             ) as T
 
         modelClass.isAssignableFrom(FoodDetailViewModel::class.java) ->

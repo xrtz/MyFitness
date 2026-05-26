@@ -37,7 +37,12 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Navigation(
                         modifier         = Modifier.padding(innerPadding),
-                        viewModelFactory = viewModelFactory
+                        viewModelFactory = viewModelFactory,
+                        onLogout         = {
+                            TokenProvider.clear()
+                            startActivity(Intent(this@MainActivity, AuthActivity::class.java))
+                            finish()
+                        }
                     )
                 }
             }

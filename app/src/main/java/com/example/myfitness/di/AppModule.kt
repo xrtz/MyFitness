@@ -28,6 +28,7 @@ class AppModule(private val context: Context) {
     fun provideAppDatabase(): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "myfitness.db")
             .allowMainThreadQueries()
+            .fallbackToDestructiveMigration()
             .build()
 
     @Provides @Singleton fun provideFoodDao(db: AppDatabase): FoodDao = db.foodDao()

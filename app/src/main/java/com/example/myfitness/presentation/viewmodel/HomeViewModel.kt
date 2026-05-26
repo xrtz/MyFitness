@@ -8,15 +8,18 @@ import com.example.myfitness.data.remote.dto.DayFoodRequest
 import com.example.myfitness.data.remote.dto.DayFoodResponse
 import com.example.myfitness.data.remote.dto.FoodItemDto
 import com.example.myfitness.domain.function.Util
+import com.example.myfitness.domain.models.DateModel
 import com.example.myfitness.domain.models.DayFoodItemModel
 import com.example.myfitness.domain.models.FoodModel
-import com.example.myfitness.domain.models.RepositoryResult
+import com.example.myfitness.domain.repository.FoodRepository
 import com.example.myfitness.domain.usecase.AddFoodItemUseCase
 import com.example.myfitness.domain.usecase.DeleteFoodItemUseCase
 import com.example.myfitness.domain.usecase.GetDayFoodItemUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
@@ -25,7 +28,8 @@ class HomeViewModel(
     private val getDayFoodItemUseCase : GetDayFoodItemUseCase,
     private val addFoodItemUseCase    : AddFoodItemUseCase,
     private val deleteFoodItemUseCase : DeleteFoodItemUseCase,
-    private val apiService            : ApiService
+    private val apiService            : ApiService,
+    private val foodRepository        : FoodRepository
 ) : ViewModel() {
 
     private val _selectedDate = MutableStateFlow(LocalDate.now())
@@ -85,14 +89,31 @@ class HomeViewModel(
         viewModelScope.launch {
             _isLoading.value = true
 
+            // 1. Сначала показываем кеш из Room
+            withContext(Dispatchers.IO) {
+                val cached = foodRepository.getDayFoodItems(DateModel(epochDay))
+                val hasFood = cached.breakfast.isNotEmpty() || cached.lunch.isNotEmpty() ||
+                              cached.dinner.isNotEmpty()    || cached.snacks.isNotEmpty()
+                if (hasFood) {
+                    _dayFoodItem.value = cached
+                } else if (_dayFoodItem.value?.date != epochDay) {
+                    _dayFoodItem.value = emptyDay(epochDay)
+                }
+            }
+
+            // 2. Пытаемся получить свежие данные с сервера
             try {
                 val response = apiService.getDay(epochDay)
                 if (response.isSuccessful && response.body() != null) {
-                    _dayFoodItem.value = response.body()!!.toDomain(epochDay)
-                } else if (_dayFoodItem.value == null) {
-                    _dayFoodItem.value = emptyDay(epochDay)
+                    val dayFromApi = response.body()!!.toDomain(epochDay)
+                    _dayFoodItem.value = dayFromApi
+                    // Сохраняем в Room кеш
+                    withContext(Dispatchers.IO) {
+                        foodRepository.updateDayFoodItems(dayFromApi)
+                    }
                 }
             } catch (e: Exception) {
+                Log.d("HOME_VM", "API unavailable, showing cache: ${e.message}")
                 if (_dayFoodItem.value == null) {
                     _dayFoodItem.value = emptyDay(epochDay)
                 }
@@ -112,22 +133,36 @@ class HomeViewModel(
 
                 val response = apiService.saveDay(
                     DayFoodRequest(
-                        date = day.date,
-                        calories = day.calories,
-                        protein = day.protein,
-                        fats = day.fats,
+                        date          = day.date,
+                        calories      = day.calories,
+                        protein       = day.protein,
+                        fats          = day.fats,
                         carbohydrates = day.carbohydrates,
-                        foodItems = allItems
+                        foodItems     = allItems
                     )
                 )
 
                 if (response.isSuccessful) {
-                    response.body()?.let {
-                        _dayFoodItem.value = it.toDomain(day.date)
+                    response.body()?.let { serverDay ->
+                        val domainDay = serverDay.toDomain(day.date)
+                        _dayFoodItem.value = domainDay
+                        // Сохраняем ответ сервера в Room (с актуальными ID)
+                        withContext(Dispatchers.IO) {
+                            foodRepository.updateDayFoodItems(domainDay)
+                        }
+                    }
+                } else {
+                    // Сервер недоступен — сохраняем текущее состояние в Room
+                    withContext(Dispatchers.IO) {
+                        foodRepository.updateDayFoodItems(day)
                     }
                 }
             } catch (e: Exception) {
                 Log.e("HOME_VM", "sync error ${e.message}")
+                // Нет интернета — сохраняем в Room для офлайн доступа
+                withContext(Dispatchers.IO) {
+                    foodRepository.updateDayFoodItems(day)
+                }
             }
         }
     }
@@ -170,6 +205,7 @@ class HomeViewModel(
         fats = fats,
         carbohydrates = carbohydrates
     )
+
     fun deleteFood(food: FoodModel, day: DayFoodItemModel) {
         val updatedBreakfast = if (food.typeOfMeal == "breakfast") day.breakfast.filter { it.id != food.id } else day.breakfast
         val updatedLunch     = if (food.typeOfMeal == "lunch")     day.lunch.filter     { it.id != food.id } else day.lunch

@@ -14,7 +14,7 @@ import com.example.myfitness.data.storage.room.entity.UserEntity
         DayFoodEntity::class,
         UserEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

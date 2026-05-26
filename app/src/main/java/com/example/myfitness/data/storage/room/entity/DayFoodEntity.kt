@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "day_food")
 data class DayFoodEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val userId: Int,
+    val userId: Int = 0,
+    val userKey: String = "",
     val date: Int,
     val calories: Float,
     val protein: Float,

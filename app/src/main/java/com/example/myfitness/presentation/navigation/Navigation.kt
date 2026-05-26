@@ -22,7 +22,8 @@ import com.example.myfitness.presentation.viewmodel.HomeViewModel
 @Composable
 fun Navigation(
     modifier         : Modifier = Modifier,
-    viewModelFactory : ViewModelFactory
+    viewModelFactory : ViewModelFactory,
+    onLogout         : () -> Unit = {}
 ) {
     val navController = rememberNavController()
     GlobalNavigation.navController = navController
@@ -39,7 +40,8 @@ fun Navigation(
                 modifier         = modifier,
                 navController    = navController,
                 homeViewModel    = homeViewModel,
-                viewModelFactory = viewModelFactory   // передаём для ProfilePage
+                viewModelFactory = viewModelFactory,
+                onLogout         = onLogout
             )
         }
 

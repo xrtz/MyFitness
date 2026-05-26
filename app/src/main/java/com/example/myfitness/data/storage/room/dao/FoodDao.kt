@@ -13,8 +13,8 @@ import com.example.myfitness.data.storage.room.entity.FoodEntity
 interface FoodDao {
 
 
-    @Query("SELECT * FROM day_food WHERE date = :date LIMIT 1")
-    fun getDayFood(date: Int): DayFoodEntity?
+    @Query("SELECT * FROM day_food WHERE date = :date AND userKey = :userKey LIMIT 1")
+    fun getDayFood(date: Int, userKey: String): DayFoodEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOrUpdateDay(day: DayFoodEntity): Long
