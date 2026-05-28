@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,7 +15,6 @@ import androidx.navigation.NavController
 import com.example.myfitness.R
 import com.example.myfitness.presentation.components.DayInfoView
 import com.example.myfitness.presentation.components.TypeOfMealView
-import com.example.myfitness.presentation.components.WeekView
 import com.example.myfitness.presentation.viewmodel.HomeViewModel
 
 @Composable
@@ -25,23 +23,16 @@ fun HomePage(
     navController : NavController,
     homeViewModel : HomeViewModel
 ) {
-    val selectedDate  by homeViewModel.selectedDate.collectAsState()
-    val dayFoodItem   by homeViewModel.dayFoodItem.collectAsState()
-    val caloriesGoal  by homeViewModel.caloriesGoal.collectAsState()
+    val selectedDate by homeViewModel.selectedDate.collectAsState()
+    val dayFoodItem  by homeViewModel.dayFoodItem.collectAsState()
+    val caloriesGoal by homeViewModel.caloriesGoal.collectAsState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        WeekView(viewModel = homeViewModel)
-
-        Text(
-            text     = selectedDate.toString(),
-            modifier = Modifier.padding(vertical = 4.dp)
-        )
-
         dayFoodItem?.let { day ->
             DayInfoView(dayFoodItem = day, caloriesGoal = caloriesGoal)
 

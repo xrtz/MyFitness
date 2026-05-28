@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -18,18 +19,23 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.myfitness.presentation.viewmodel.FoodDetailViewModel
 import com.example.myfitness.presentation.viewmodel.HomeViewModel
 
@@ -77,12 +83,29 @@ fun FoodDetailPage(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("$mealTitle · $selectedDate") },
+                title = {
+                    Column {
+                        Text(
+                            text       = mealTitle,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text     = selectedDate.toString(),
+                            style    = MaterialTheme.typography.labelSmall,
+                            color    = Color.White.copy(alpha = 0.8f)
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor         = MaterialTheme.colorScheme.primary,
+                    titleContentColor      = Color.White,
+                    navigationIconContentColor = Color.White
+                )
             )
         }
     ) { innerPadding ->
@@ -90,7 +113,7 @@ fun FoodDetailPage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -99,7 +122,8 @@ fun FoodDetailPage(
                 onValueChange = foodDetailViewModel::onNameChange,
                 label         = { Text("Название продукта") },
                 modifier      = Modifier.fillMaxWidth(),
-                singleLine    = true
+                singleLine    = true,
+                shape         = RoundedCornerShape(12.dp)
             )
             OutlinedTextField(
                 value           = detailState.weight,
@@ -107,7 +131,8 @@ fun FoodDetailPage(
                 label           = { Text("Вес (г)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier        = Modifier.fillMaxWidth(),
-                singleLine      = true
+                singleLine      = true,
+                shape           = RoundedCornerShape(12.dp)
             )
             OutlinedTextField(
                 value           = detailState.calories,
@@ -115,11 +140,12 @@ fun FoodDetailPage(
                 label           = { Text("Калории (ккал)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier        = Modifier.fillMaxWidth(),
-                singleLine      = true
+                singleLine      = true,
+                shape           = RoundedCornerShape(12.dp)
             )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier              = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
                     value           = detailState.protein,
@@ -127,7 +153,8 @@ fun FoodDetailPage(
                     label           = { Text("Белки (г)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier        = Modifier.weight(1f),
-                    singleLine      = true
+                    singleLine      = true,
+                    shape           = RoundedCornerShape(12.dp)
                 )
                 OutlinedTextField(
                     value           = detailState.fats,
@@ -135,7 +162,8 @@ fun FoodDetailPage(
                     label           = { Text("Жиры (г)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier        = Modifier.weight(1f),
-                    singleLine      = true
+                    singleLine      = true,
+                    shape           = RoundedCornerShape(12.dp)
                 )
                 OutlinedTextField(
                     value           = detailState.carbohydrates,
@@ -143,11 +171,12 @@ fun FoodDetailPage(
                     label           = { Text("Углев. (г)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier        = Modifier.weight(1f),
-                    singleLine      = true
+                    singleLine      = true,
+                    shape           = RoundedCornerShape(12.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Button(
                 onClick = {
@@ -165,10 +194,15 @@ fun FoodDetailPage(
                         )
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape    = RoundedCornerShape(12.dp),
                 enabled  = dayFoodItem != null
             ) {
-                Text(if (foodId == null) "Добавить" else "Сохранить")
+                Text(
+                    text       = if (foodId == null) "Добавить" else "Сохранить",
+                    fontSize   = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
 
             detailState.error?.let { err ->

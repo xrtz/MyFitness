@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,50 +23,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.myfitness.presentation.viewmodel.HomeViewModel
 import java.time.LocalDate
 
-// Центральная страница пейджера — от неё считаем недели назад/вперёд
 private const val PAGER_CENTER = 500
 
 @Composable
 fun WeekView(viewModel: HomeViewModel) {
-
     val selectedDate by viewModel.selectedDate.collectAsState()
-
-    // Запоминаем сегодняшнюю дату один раз при первом рендере
-    val today = remember { LocalDate.now() }
-
-    // Вычисляем начало текущей недели (понедельник)
+    val today        = remember { LocalDate.now() }
     val todayWeekStart = remember { viewModel.getStartOfWeek(today) }
 
     val pagerState = rememberPagerState(
         initialPage = PAGER_CENTER,
-        pageCount = { PAGER_CENTER * 2 }
+        pageCount   = { PAGER_CENTER * 2 }
     )
 
     HorizontalPager(
-        state = pagerState,
+        state    = pagerState,
         modifier = Modifier.fillMaxWidth()
     ) { page ->
-        // page == PAGER_CENTER → текущая неделя
-        // page == PAGER_CENTER + 1 → следующая неделя и т.д.
-        val weekOffset = (page - PAGER_CENTER).toLong()
+        val weekOffset    = (page - PAGER_CENTER).toLong()
         val currentWeekStart = todayWeekStart.plusWeeks(weekOffset)
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
+            modifier              = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             for (i in 0..6) {
                 val date = currentWeekStart.plusDays(i.toLong())
                 DayItem(
-                    date = date,
+                    date       = date,
                     isSelected = date == selectedDate,
-                    onClick = { viewModel.selectDate(date) }
+                    onClick    = { viewModel.selectDate(date) }
                 )
             }
         }
@@ -74,45 +67,52 @@ fun WeekView(viewModel: HomeViewModel) {
 
 @Composable
 fun DayItem(
-    date: LocalDate,
-    isSelected: Boolean,
-    onClick: () -> Unit
+    date       : LocalDate,
+    isSelected : Boolean,
+    onClick    : () -> Unit
 ) {
-    val today = remember { LocalDate.now() }
+    val today   = remember { LocalDate.now() }
     val isToday = date == today
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier            = Modifier
             .clickable { onClick() }
             .padding(4.dp)
     ) {
         Text(
-            text = date.dayOfWeek.name.take(3),
-            color = if (isToday) Color(0xFF4CAF50) else Color.Gray
+            text       = date.dayOfWeek.name.take(2),
+            fontSize   = 11.sp,
+            fontWeight = FontWeight.Medium,
+            color      = when {
+                isToday -> MaterialTheme.colorScheme.primary
+                else    -> MaterialTheme.colorScheme.outline
+            }
         )
 
         Spacer(modifier = Modifier.height(4.dp))
 
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(40.dp)
+            modifier         = Modifier
+                .size(38.dp)
                 .background(
                     color = when {
-                        isSelected -> Color(0xFF4CAF50)
-                        isToday -> Color(0xFFE8F5E9)
-                        else -> Color.Transparent
+                        isSelected -> MaterialTheme.colorScheme.primary
+                        isToday    -> MaterialTheme.colorScheme.primaryContainer
+                        else       -> Color.Transparent
                     },
                     shape = CircleShape
                 )
         ) {
             Text(
-                text = date.dayOfMonth.toString(),
-                color = when {
+                text       = date.dayOfMonth.toString(),
+                fontSize   = 14.sp,
+                fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
+                color      = when {
                     isSelected -> Color.White
-                    isToday -> Color(0xFF2E7D32)
-                    else -> Color.Black
+                    isToday    -> MaterialTheme.colorScheme.primary
+                    else       -> MaterialTheme.colorScheme.onBackground
                 }
             )
         }
