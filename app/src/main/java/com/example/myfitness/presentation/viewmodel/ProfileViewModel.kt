@@ -2,8 +2,9 @@ package com.example.myfitness.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myfitness.data.remote.ApiService
-import com.example.myfitness.data.remote.dto.UserRequest
+import com.example.myfitness.domain.models.UserModel
+import com.example.myfitness.domain.usecase.GetUserProfileUseCase
+import com.example.myfitness.domain.usecase.UpdateUserProfileUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -21,32 +22,28 @@ data class ProfileState(
 )
 
 class ProfileViewModel(
-    private val apiService: ApiService
+    private val getUserProfileUseCase    : GetUserProfileUseCase,
+    private val updateUserProfileUseCase : UpdateUserProfileUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
     val state: StateFlow<ProfileState> = _state
 
-    init { loadFromServer() }
+    init { loadProfile() }
 
-    private fun loadFromServer() {
+    private fun loadProfile() {
         viewModelScope.launch {
             try {
-                val response = apiService.getMe()
-                if (response.isSuccessful) {
-                    val user = response.body()!!
-                    _state.value = ProfileState(
-                        name   = user.name,
-                        gender = user.gender.toString(),
-                        email  = user.email,
-                        weight = if (user.weight > 0) user.weight.toString() else "",
-                        height = if (user.height > 0) user.height.toString() else "",
-                        target = user.target
-                    )
-                }
-            } catch (e: Exception) {
-                // Нет интернета — поля пустые
-            }
+                val user = getUserProfileUseCase.execute()
+                _state.value = ProfileState(
+                    name   = user.name,
+                    gender = user.gender.toString(),
+                    email  = user.gmail,
+                    weight = if (user.weight > 0) user.weight.toString() else "",
+                    height = if (user.height > 0) user.height.toString() else "",
+                    target = user.target
+                )
+            } catch (_: Exception) { }
         }
     }
 
@@ -66,27 +63,21 @@ class ProfileViewModel(
         viewModelScope.launch {
             _state.value = s.copy(isLoading = true, error = null)
             try {
-                val response = apiService.updateMe(
-                    UserRequest(
+                updateUserProfileUseCase.execute(
+                    UserModel(
+                        id     = 0,
                         name   = s.name,
                         gender = s.gender.toIntOrNull() ?: 0,
-                        email  = s.email,
+                        gmail  = s.email,
                         weight = s.weight.toFloatOrNull() ?: 0f,
                         height = s.height.toFloatOrNull() ?: 0f,
                         target = s.target
                     )
                 )
-                if (response.isSuccessful) {
-                    _state.value = _state.value.copy(isSaved = true, isLoading = false)
-                } else {
-                    _state.value = _state.value.copy(
-                        error = "Ошибка ${response.code()}",
-                        isLoading = false
-                    )
-                }
+                _state.value = _state.value.copy(isSaved = true, isLoading = false)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
-                    error = "Нет подключения к серверу",
+                    error     = e.message ?: "Нет подключения к серверу",
                     isLoading = false
                 )
             }

@@ -1,6 +1,5 @@
 package com.example.myfitness.presentation.pages
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,8 +50,6 @@ fun FoodDetailPage(
     val detailState  by foodDetailViewModel.state.collectAsState()
     val selectedDate by homeViewModel.selectedDate.collectAsState()
     val dayFoodItem  by homeViewModel.dayFoodItem.collectAsState()
-
-    Log.d("DETAIL_PAGE", "selectedDate=$selectedDate dayFoodItem.date=${dayFoodItem?.date}")
 
     LaunchedEffect(foodId) {
         if (foodId != null) {
@@ -181,16 +178,12 @@ fun FoodDetailPage(
             Button(
                 onClick = {
                     val day = dayFoodItem
-                    Log.d("DETAIL_PAGE", "Save clicked: day.date=${day?.date}")
                     if (day != null) {
                         foodDetailViewModel.save(
                             typeOfMeal = typeOfMeal,
                             currentDay = day,
                             foodId     = foodId,
-                            onSaved    = { dayCopy ->
-                                Log.d("DETAIL_PAGE", "onSaved: dayCopy.breakfast=${dayCopy.breakfast.size}")
-                                homeViewModel.syncDayToServer(dayCopy)
-                            }
+                            onSaved    = homeViewModel::updateDayState
                         )
                     }
                 },

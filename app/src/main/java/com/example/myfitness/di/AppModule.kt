@@ -2,15 +2,21 @@ package com.example.myfitness.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.myfitness.data.datasource.remote.ApiRemoteFoodDataSource
+import com.example.myfitness.data.datasource.remote.ApiRemoteUserDataSource
+import com.example.myfitness.data.datasource.remote.RemoteFoodDataSource
+import com.example.myfitness.data.datasource.remote.RemoteUserDataSource
 import com.example.myfitness.data.remote.ApiService
 import com.example.myfitness.data.remote.AuthInterceptor
 import com.example.myfitness.data.repository.FoodRepositoryImpl
+import com.example.myfitness.data.repository.UserRepositoryImpl
 import com.example.myfitness.data.storage.Storage
 import com.example.myfitness.data.storage.room.AppDatabase
 import com.example.myfitness.data.storage.room.RoomStorageImpl
 import com.example.myfitness.data.storage.room.dao.FoodDao
 import com.example.myfitness.data.storage.room.dao.UserDao
 import com.example.myfitness.domain.repository.FoodRepository
+import com.example.myfitness.domain.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -23,7 +29,6 @@ import javax.inject.Singleton
 @Module
 class AppModule(private val context: Context) {
 
-
     @Provides @Singleton
     fun provideAppDatabase(): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "myfitness.db")
@@ -33,9 +38,12 @@ class AppModule(private val context: Context) {
 
     @Provides @Singleton fun provideFoodDao(db: AppDatabase): FoodDao = db.foodDao()
     @Provides @Singleton fun provideUserDao(db: AppDatabase): UserDao = db.userDao()
-    @Provides @Singleton fun provideStorage(impl: RoomStorageImpl): Storage = impl
-    @Provides @Singleton fun provideFoodRepository(impl: FoodRepositoryImpl): FoodRepository = impl
 
+    @Provides @Singleton fun provideStorage(impl: RoomStorageImpl): Storage = impl
+    @Provides @Singleton fun provideRemoteFoodDataSource(impl: ApiRemoteFoodDataSource): RemoteFoodDataSource = impl
+    @Provides @Singleton fun provideRemoteUserDataSource(impl: ApiRemoteUserDataSource): RemoteUserDataSource = impl
+    @Provides @Singleton fun provideFoodRepository(impl: FoodRepositoryImpl): FoodRepository = impl
+    @Provides @Singleton fun provideUserRepository(impl: UserRepositoryImpl): UserRepository = impl
 
     @Provides @Singleton
     fun provideAuthInterceptor(): AuthInterceptor = AuthInterceptor()

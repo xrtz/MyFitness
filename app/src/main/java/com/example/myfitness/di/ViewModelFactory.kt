@@ -2,12 +2,18 @@ package com.example.myfitness.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.myfitness.data.remote.ApiService
 import com.example.myfitness.domain.repository.FoodRepository
+import com.example.myfitness.domain.repository.UserRepository
 import com.example.myfitness.domain.usecase.AddFoodItemUseCase
 import com.example.myfitness.domain.usecase.ChangeFoodItemUseCase
 import com.example.myfitness.domain.usecase.DeleteFoodItemUseCase
-import com.example.myfitness.domain.usecase.GetDayFoodItemUseCase
+import com.example.myfitness.domain.usecase.GetCaloriesGoalUseCase
+import com.example.myfitness.domain.usecase.GetUserProfileUseCase
+import com.example.myfitness.domain.usecase.LoadDayUseCase
+import com.example.myfitness.domain.usecase.LoginUseCase
+import com.example.myfitness.domain.usecase.RegisterUseCase
+import com.example.myfitness.domain.usecase.SyncDayUseCase
+import com.example.myfitness.domain.usecase.UpdateUserProfileUseCase
 import com.example.myfitness.presentation.viewmodel.AuthViewModel
 import com.example.myfitness.presentation.viewmodel.FoodDetailViewModel
 import com.example.myfitness.presentation.viewmodel.HomeViewModel
@@ -16,31 +22,37 @@ import javax.inject.Inject
 
 class ViewModelFactory @Inject constructor(
     private val foodRepository : FoodRepository,
-    private val apiService     : ApiService
+    private val userRepository : UserRepository
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when {
         modelClass.isAssignableFrom(AuthViewModel::class.java) ->
-            AuthViewModel(apiService) as T
+            AuthViewModel(
+                loginUseCase    = LoginUseCase(userRepository),
+                registerUseCase = RegisterUseCase(userRepository)
+            ) as T
 
         modelClass.isAssignableFrom(HomeViewModel::class.java) ->
             HomeViewModel(
-                getDayFoodItemUseCase = GetDayFoodItemUseCase(foodRepository),
-                addFoodItemUseCase    = AddFoodItemUseCase(foodRepository),
-                deleteFoodItemUseCase = DeleteFoodItemUseCase(foodRepository),
-                apiService            = apiService,
-                foodRepository        = foodRepository
+                loadDayUseCase         = LoadDayUseCase(foodRepository),
+                deleteFoodItemUseCase  = DeleteFoodItemUseCase(foodRepository),
+                syncDayUseCase         = SyncDayUseCase(foodRepository),
+                getCaloriesGoalUseCase = GetCaloriesGoalUseCase(userRepository)
             ) as T
 
         modelClass.isAssignableFrom(FoodDetailViewModel::class.java) ->
             FoodDetailViewModel(
                 addFoodItemUseCase    = AddFoodItemUseCase(foodRepository),
-                changeFoodItemUseCase = ChangeFoodItemUseCase(foodRepository)
+                changeFoodItemUseCase = ChangeFoodItemUseCase(foodRepository),
+                syncDayUseCase        = SyncDayUseCase(foodRepository)
             ) as T
 
         modelClass.isAssignableFrom(ProfileViewModel::class.java) ->
-            ProfileViewModel(apiService) as T
+            ProfileViewModel(
+                getUserProfileUseCase    = GetUserProfileUseCase(userRepository),
+                updateUserProfileUseCase = UpdateUserProfileUseCase(userRepository)
+            ) as T
 
         else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
     }

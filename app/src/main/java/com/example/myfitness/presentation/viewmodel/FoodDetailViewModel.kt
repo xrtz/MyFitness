@@ -1,14 +1,15 @@
 package com.example.myfitness.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.myfitness.domain.models.DayFoodItemModel
 import com.example.myfitness.domain.models.FoodModel
-import com.example.myfitness.domain.models.RepositoryResult
 import com.example.myfitness.domain.usecase.AddFoodItemUseCase
 import com.example.myfitness.domain.usecase.ChangeFoodItemUseCase
+import com.example.myfitness.domain.usecase.SyncDayUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 data class FoodDetailState(
     val name          : String  = "",
@@ -23,7 +24,8 @@ data class FoodDetailState(
 
 class FoodDetailViewModel(
     private val addFoodItemUseCase    : AddFoodItemUseCase,
-    private val changeFoodItemUseCase : ChangeFoodItemUseCase
+    private val changeFoodItemUseCase : ChangeFoodItemUseCase,
+    private val syncDayUseCase        : SyncDayUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FoodDetailState())
@@ -47,19 +49,15 @@ class FoodDetailViewModel(
         )
     }
 
-    fun resetSaved() {
-        _state.value = _state.value.copy(isSaved = false)
-    }
+    fun resetSaved() { _state.value = _state.value.copy(isSaved = false) }
 
-    fun resetForm() {
-        _state.value = FoodDetailState()
-    }
+    fun resetForm() { _state.value = FoodDetailState() }
 
     fun save(
         typeOfMeal : String,
         currentDay : DayFoodItemModel,
         foodId     : Int?,
-        onSaved    : (dayCopy: DayFoodItemModel) -> Unit
+        onSaved    : (DayFoodItemModel) -> Unit
     ) {
         val s = _state.value
         if (s.name.isBlank()) {
@@ -78,54 +76,19 @@ class FoodDetailViewModel(
             carbohydrates = s.carbohydrates.toFloatOrNull() ?: 0f
         )
 
-        Log.d("DETAIL_VM", "save: typeOfMeal=$typeOfMeal, currentDay.date=${currentDay.date}, currentDay.id=${currentDay.id}")
-
-        val result = if (foodId == null) {
-            addFoodItemUseCase.execute(food, currentDay)
-        } else {
-            changeFoodItemUseCase.execute(food, currentDay)
-        }
-
-        when (result) {
-            is RepositoryResult.Success -> {
-                val updatedBreakfast = when {
-                    typeOfMeal != "breakfast" -> currentDay.breakfast
-                    foodId != null -> currentDay.breakfast.map { if (it.id == foodId) food else it }
-                    else -> currentDay.breakfast + food
+        viewModelScope.launch {
+            try {
+                val updatedDay = if (foodId == null) {
+                    addFoodItemUseCase.execute(food, currentDay)
+                } else {
+                    changeFoodItemUseCase.execute(food, currentDay)
                 }
-                val updatedLunch = when {
-                    typeOfMeal != "lunch" -> currentDay.lunch
-                    foodId != null -> currentDay.lunch.map { if (it.id == foodId) food else it }
-                    else -> currentDay.lunch + food
-                }
-                val updatedDinner = when {
-                    typeOfMeal != "dinner" -> currentDay.dinner
-                    foodId != null -> currentDay.dinner.map { if (it.id == foodId) food else it }
-                    else -> currentDay.dinner + food
-                }
-                val updatedSnacks = when {
-                    typeOfMeal != "snacks" -> currentDay.snacks
-                    foodId != null -> currentDay.snacks.map { if (it.id == foodId) food else it }
-                    else -> currentDay.snacks + food
-                }
-                val allItems = updatedBreakfast + updatedLunch + updatedDinner + updatedSnacks
-                val dayCopy = currentDay.copy(
-                    calories      = allItems.sumOf { it.calories.toDouble() }.toFloat(),
-                    protein       = allItems.sumOf { it.protein.toDouble() }.toFloat(),
-                    fats          = allItems.sumOf { it.fats.toDouble() }.toFloat(),
-                    carbohydrates = allItems.sumOf { it.carbohydrates.toDouble() }.toFloat(),
-                    breakfast     = updatedBreakfast,
-                    lunch         = updatedLunch,
-                    dinner        = updatedDinner,
-                    snacks        = updatedSnacks
-                )
+                val syncedDay = syncDayUseCase.execute(updatedDay)
                 _state.value = _state.value.copy(isSaved = true)
-                onSaved(dayCopy)
+                onSaved(syncedDay)
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(error = e.message)
             }
-            is RepositoryResult.Error -> {
-                _state.value = _state.value.copy(error = result.error.message)
-            }
-            else -> {}
         }
     }
 }

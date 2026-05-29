@@ -1,12 +1,10 @@
 package com.example.myfitness.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myfitness.data.remote.ApiService
 import com.example.myfitness.data.remote.TokenProvider
-import com.example.myfitness.data.remote.dto.LoginRequest
-import com.example.myfitness.data.remote.dto.RegisterRequest
+import com.example.myfitness.domain.usecase.LoginUseCase
+import com.example.myfitness.domain.usecase.RegisterUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,7 +17,8 @@ sealed class AuthState {
 }
 
 class AuthViewModel(
-    private val apiService: ApiService
+    private val loginUseCase    : LoginUseCase,
+    private val registerUseCase : RegisterUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -33,22 +32,15 @@ class AuthViewModel(
         viewModelScope.launch {
             _state.value = AuthState.Loading
             try {
-                val response = apiService.login(LoginRequest(email, password))
-                when {
-                    response.isSuccessful -> {
-                        val body = response.body()!!
-                        TokenProvider.save(body.token, body.user.firebaseUid)
-                        Log.d("AUTH_VM", "Login OK")
-                        _state.value = AuthState.Success
-                    }
-                    response.code() == 401 || response.code() == 404 ->
-                        _state.value = AuthState.Error("Неверный email или пароль")
-                    else ->
-                        _state.value = AuthState.Error("Ошибка сервера (${response.code()})")
-                }
+                loginUseCase.execute(email, password)
+                _state.value = AuthState.Success
             } catch (e: Exception) {
-                Log.e("AUTH_VM", "Login error", e)
-                _state.value = AuthState.Error(e.message ?: "Ошибка подключения")
+                val msg = when {
+                    e.message?.contains("401") == true || e.message?.contains("404") == true ->
+                        "Неверный email или пароль"
+                    else -> e.message ?: "Ошибка подключения"
+                }
+                _state.value = AuthState.Error(msg)
             }
         }
     }
@@ -69,32 +61,22 @@ class AuthViewModel(
         viewModelScope.launch {
             _state.value = AuthState.Loading
             try {
-                val response = apiService.register(
-                    RegisterRequest(
-                        name     = name,
-                        email    = email,
-                        password = password,
-                        gender   = gender,
-                        weight   = weight.toFloatOrNull() ?: 0f,
-                        height   = height.toFloatOrNull() ?: 0f,
-                        target   = target
-                    )
+                registerUseCase.execute(
+                    name     = name,
+                    email    = email,
+                    password = password,
+                    gender   = gender,
+                    weight   = weight.toFloatOrNull() ?: 0f,
+                    height   = height.toFloatOrNull() ?: 0f,
+                    target   = target
                 )
-                when {
-                    response.isSuccessful -> {
-                        val body = response.body()!!
-                        TokenProvider.save(body.token, body.user.firebaseUid)
-                        Log.d("AUTH_VM", "Register OK")
-                        _state.value = AuthState.Success
-                    }
-                    response.code() == 409 ->
-                        _state.value = AuthState.Error("Email уже зарегистрирован")
-                    else ->
-                        _state.value = AuthState.Error("Ошибка регистрации (${response.code()})")
-                }
+                _state.value = AuthState.Success
             } catch (e: Exception) {
-                Log.e("AUTH_VM", "Register error", e)
-                _state.value = AuthState.Error(e.message ?: "Ошибка подключения")
+                val msg = when {
+                    e.message?.contains("409") == true -> "Email уже зарегистрирован"
+                    else -> e.message ?: "Ошибка регистрации"
+                }
+                _state.value = AuthState.Error(msg)
             }
         }
     }

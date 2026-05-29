@@ -1,33 +1,25 @@
 package com.example.myfitness.data.storage.room
 
-import android.util.Log
 import com.example.myfitness.data.remote.TokenProvider
 import com.example.myfitness.data.storage.Storage
 import com.example.myfitness.data.storage.room.dao.FoodDao
-import com.example.myfitness.data.storage.room.dao.UserDao
 import com.example.myfitness.data.storage.room.entity.DayFoodEntity
 import com.example.myfitness.data.storage.room.entity.FoodEntity
-import com.example.myfitness.data.storage.room.entity.UserEntity
 import com.example.myfitness.domain.models.DateModel
 import com.example.myfitness.domain.models.DayFoodItemModel
 import com.example.myfitness.domain.models.FoodModel
-import com.example.myfitness.domain.models.RepositoryResult
-import com.example.myfitness.domain.models.UserModel
 import javax.inject.Inject
 
 class RoomStorageImpl @Inject constructor(
-    private val foodDao : FoodDao,
-    private val userDao : UserDao
+    private val foodDao: FoodDao
 ) : Storage {
 
     private fun currentUserKey() = TokenProvider.userId ?: ""
 
     override fun getDayFoodItems(date: DateModel): DayFoodItemModel {
-        val userKey = currentUserKey()
-        Log.d("ROOM", "getDayFoodItems date=${date.day} userKey=$userKey")
+        val userKey   = currentUserKey()
         val dayEntity = foodDao.getDayFood(date.day, userKey) ?: return emptyDay(date.day)
         val allFood   = foodDao.getFoodByDay(dayEntity.id)
-        Log.d("ROOM", "found day id=${dayEntity.id}, foods=${allFood.size}")
 
         return DayFoodItemModel(
             id            = dayEntity.id,
@@ -44,15 +36,13 @@ class RoomStorageImpl @Inject constructor(
         )
     }
 
-    override fun updateDayFoodItems(day: DayFoodItemModel): RepositoryResult {
-        val userKey = currentUserKey()
-        return try {
-            Log.d("ROOM", "updateDayFoodItems day.date=${day.date} day.id=${day.id} userKey=$userKey")
+    override fun updateDayFoodItems(day: DayFoodItemModel) {
+        val userKey     = currentUserKey()
+        val existingDay = foodDao.getDayFood(day.date, userKey)
 
-            val existingDay = foodDao.getDayFood(day.date, userKey)
-
-            val resolvedDayId: Int = if (existingDay == null) {
-                val newEntity = DayFoodEntity(
+        val resolvedDayId: Int = if (existingDay == null) {
+            foodDao.insertOrUpdateDay(
+                DayFoodEntity(
                     id            = 0,
                     userId        = day.userId,
                     userKey       = userKey,
@@ -62,57 +52,26 @@ class RoomStorageImpl @Inject constructor(
                     fats          = day.fats,
                     carbohydrates = day.carbohydrates
                 )
-                val newId = foodDao.insertOrUpdateDay(newEntity).toInt()
-                Log.d("ROOM", "Inserted new day, id=$newId")
-                newId
-            } else {
-                foodDao.insertOrUpdateDay(
-                    existingDay.copy(
-                        calories      = day.calories,
-                        protein       = day.protein,
-                        fats          = day.fats,
-                        carbohydrates = day.carbohydrates,
-                        userKey       = userKey
-                    )
+            ).toInt()
+        } else {
+            foodDao.insertOrUpdateDay(
+                existingDay.copy(
+                    calories      = day.calories,
+                    protein       = day.protein,
+                    fats          = day.fats,
+                    carbohydrates = day.carbohydrates,
+                    userKey       = userKey
                 )
-                Log.d("ROOM", "Updated existing day, id=${existingDay.id}")
-                existingDay.id
-            }
+            )
+            existingDay.id
+        }
 
-            foodDao.deleteAllFoodByDayId(resolvedDayId)
-            Log.d("ROOM", "Deleted all old foods for dayId=$resolvedDayId")
-
-            val allFood = day.breakfast + day.lunch + day.dinner + day.snacks
-            Log.d("ROOM", "Inserting ${allFood.size} foods")
-            allFood.forEach { food ->
-                foodDao.insertFood(food.toEntity(dayId = resolvedDayId, forceNewId = true))
-            }
-
-            RepositoryResult.Success("OK dayId=$resolvedDayId")
-        } catch (e: Exception) {
-            Log.e("ROOM", "updateDayFoodItems error", e)
-            RepositoryResult.Error(e)
+        foodDao.deleteAllFoodByDayId(resolvedDayId)
+        val allFood = day.breakfast + day.lunch + day.dinner + day.snacks
+        allFood.forEach { food ->
+            foodDao.insertFood(food.toEntity(dayId = resolvedDayId, forceNewId = true))
         }
     }
-
-    override fun getUserModel(userModel: UserModel): RepositoryResult {
-        return try {
-            if (userDao.getUser() != null) RepositoryResult.Success("User found")
-            else RepositoryResult.Error(Exception("User not found"))
-        } catch (e: Exception) { RepositoryResult.Error(e) }
-    }
-
-    override fun updateUserModel(userModel: UserModel): RepositoryResult {
-        return try {
-            val entity   = userModel.toEntity()
-            val existing = userDao.getUser()
-            if (existing == null) userDao.insertUser(entity)
-            else userDao.updateUser(entity.copy(id = existing.id))
-            RepositoryResult.Success("User updated")
-        } catch (e: Exception) { RepositoryResult.Error(e) }
-    }
-
-
 
     private fun FoodEntity.toModel() = FoodModel(
         id            = id,
@@ -135,16 +94,6 @@ class RoomStorageImpl @Inject constructor(
         protein       = protein,
         fats          = fats,
         carbohydrates = carbohydrates
-    )
-
-    private fun UserModel.toEntity() = UserEntity(
-        id     = id,
-        name   = name,
-        gender = gender,
-        gmail  = gmail,
-        weight = weight,
-        height = height,
-        target = target
     )
 
     private fun emptyDay(date: Int) = DayFoodItemModel(
