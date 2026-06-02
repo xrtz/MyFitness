@@ -29,26 +29,43 @@ import javax.inject.Singleton
 @Module
 class AppModule(private val context: Context) {
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     fun provideAppDatabase(): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "myfitness.db")
             .allowMainThreadQueries()
             .fallbackToDestructiveMigration()
             .build()
 
-    @Provides @Singleton fun provideFoodDao(db: AppDatabase): FoodDao = db.foodDao()
-    @Provides @Singleton fun provideUserDao(db: AppDatabase): UserDao = db.userDao()
+    @Provides
+    @Singleton
+    fun provideFoodDao(db: AppDatabase): FoodDao = db.foodDao()
+    @Provides
+    @Singleton
+    fun provideUserDao(db: AppDatabase): UserDao = db.userDao()
 
-    @Provides @Singleton fun provideStorage(impl: RoomStorageImpl): Storage = impl
-    @Provides @Singleton fun provideRemoteFoodDataSource(impl: ApiRemoteFoodDataSource): RemoteFoodDataSource = impl
-    @Provides @Singleton fun provideRemoteUserDataSource(impl: ApiRemoteUserDataSource): RemoteUserDataSource = impl
-    @Provides @Singleton fun provideFoodRepository(impl: FoodRepositoryImpl): FoodRepository = impl
-    @Provides @Singleton fun provideUserRepository(impl: UserRepositoryImpl): UserRepository = impl
+    @Provides
+    @Singleton
+    fun provideStorage(impl: RoomStorageImpl): Storage = impl
+    @Provides
+    @Singleton
+    fun provideRemoteFoodDataSource(impl: ApiRemoteFoodDataSource): RemoteFoodDataSource = impl
+    @Provides
+    @Singleton
+    fun provideRemoteUserDataSource(impl: ApiRemoteUserDataSource): RemoteUserDataSource = impl
+    @Provides
+    @Singleton
+    fun provideFoodRepository(impl: FoodRepositoryImpl): FoodRepository = impl
+    @Provides
+    @Singleton
+    fun provideUserRepository(impl: UserRepositoryImpl): UserRepository = impl
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     fun provideAuthInterceptor(): AuthInterceptor = AuthInterceptor()
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient =
         OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
@@ -61,7 +78,8 @@ class AppModule(private val context: Context) {
             .retryOnConnectionFailure(true)
             .build()
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl("http://172.20.10.2:8080/")
@@ -69,7 +87,8 @@ class AppModule(private val context: Context) {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     fun provideApiService(retrofit: Retrofit): ApiService =
         retrofit.create(ApiService::class.java)
 }

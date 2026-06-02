@@ -10,31 +10,43 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class FoodRepositoryImpl @Inject constructor(
-    private val storage          : Storage,
-    private val remoteDataSource : RemoteFoodDataSource
+    private val storage: Storage,
+    private val remoteDataSource: RemoteFoodDataSource
 ) : FoodRepository {
 
     override fun getDayFoodItems(date: DateModel): DayFoodItemModel =
         storage.getDayFoodItems(date)
 
     override fun updateDayFoodItems(day: DayFoodItemModel) =
-        storage.updateDayFoodItems(day)
+        storage.updateDayFoodItems(day, isSynced = false)
+
+    override fun getPendingSyncDays(): List<DayFoodItemModel> =
+        storage.getUnsyncedDays()
 
     override suspend fun loadDayFromServer(epochDay: Int): DayFoodItemModel? {
         return try {
             val day = remoteDataSource.getDay(epochDay)
-            day?.let { withContext(Dispatchers.IO) { storage.updateDayFoodItems(it) } }
+            day?.let {
+                withContext(Dispatchers.IO) {
+                    storage.updateDayFoodItems(
+                        it,
+                        isSynced = true
+                    )
+                }
+            }
             day
-        } catch (_: Exception) { null }
+        } catch (_: Exception) {
+            null
+        }
     }
 
     override suspend fun syncDayToServer(day: DayFoodItemModel): DayFoodItemModel? {
         return try {
             val synced = remoteDataSource.saveDay(day)
-            withContext(Dispatchers.IO) { storage.updateDayFoodItems(synced) }
+            withContext(Dispatchers.IO) { storage.updateDayFoodItems(synced, isSynced = true) }
             synced
         } catch (_: Exception) {
-            withContext(Dispatchers.IO) { storage.updateDayFoodItems(day) }
+            withContext(Dispatchers.IO) { storage.updateDayFoodItems(day, isSynced = false) }
             null
         }
     }

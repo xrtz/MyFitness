@@ -19,12 +19,12 @@ import com.example.myfitness.presentation.viewmodel.HomeViewModel
 
 @Composable
 fun HomePage(
-    modifier      : Modifier = Modifier,
-    navController : NavController,
-    homeViewModel : HomeViewModel
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    homeViewModel: HomeViewModel
 ) {
     val selectedDate by homeViewModel.selectedDate.collectAsState()
-    val dayFoodItem  by homeViewModel.dayFoodItem.collectAsState()
+    val dayFoodItem by homeViewModel.dayFoodItem.collectAsState()
     val caloriesGoal by homeViewModel.caloriesGoal.collectAsState()
 
     Column(
@@ -37,42 +37,42 @@ fun HomePage(
             DayInfoView(dayFoodItem = day, caloriesGoal = caloriesGoal)
 
             TypeOfMealView(
-                name          = stringResource(R.string.breakfast),
-                foods         = day.breakfast,
-                typeOfMeal    = "breakfast",
-                selectedDate  = selectedDate,
-                onAddClick    = { navController.navigate("food_detail/breakfast") },
-                onEditClick   = { food -> navController.navigate("food_detail/breakfast?foodId=${food.id}") },
+                name = stringResource(R.string.breakfast),
+                foods = day.breakfast,
+                typeOfMeal = "breakfast",
+                selectedDate = selectedDate,
+                onAddClick = { navController.navigate("food_detail/breakfast") },
+                onEditClick = { food -> navController.navigate("food_detail/breakfast?foodId=${food.id}") },
                 onDeleteClick = { food -> homeViewModel.deleteFood(food, day) }
             )
 
             TypeOfMealView(
-                name          = stringResource(R.string.lunch),
-                foods         = day.lunch,
-                typeOfMeal    = "lunch",
-                selectedDate  = selectedDate,
-                onAddClick    = { navController.navigate("food_detail/lunch") },
-                onEditClick   = { food -> navController.navigate("food_detail/lunch?foodId=${food.id}") },
+                name = stringResource(R.string.lunch),
+                foods = day.lunch,
+                typeOfMeal = "lunch",
+                selectedDate = selectedDate,
+                onAddClick = { navController.navigate("food_detail/lunch") },
+                onEditClick = { food -> navController.navigate("food_detail/lunch?foodId=${food.id}") },
                 onDeleteClick = { food -> homeViewModel.deleteFood(food, day) }
             )
 
             TypeOfMealView(
-                name          = stringResource(R.string.dinner),
-                foods         = day.dinner,
-                typeOfMeal    = "dinner",
-                selectedDate  = selectedDate,
-                onAddClick    = { navController.navigate("food_detail/dinner") },
-                onEditClick   = { food -> navController.navigate("food_detail/dinner?foodId=${food.id}") },
+                name = stringResource(R.string.dinner),
+                foods = day.dinner,
+                typeOfMeal = "dinner",
+                selectedDate = selectedDate,
+                onAddClick = { navController.navigate("food_detail/dinner") },
+                onEditClick = { food -> navController.navigate("food_detail/dinner?foodId=${food.id}") },
                 onDeleteClick = { food -> homeViewModel.deleteFood(food, day) }
             )
 
             TypeOfMealView(
-                name          = stringResource(R.string.piece),
-                foods         = day.snacks,
-                typeOfMeal    = "snacks",
-                selectedDate  = selectedDate,
-                onAddClick    = { navController.navigate("food_detail/snacks") },
-                onEditClick   = { food -> navController.navigate("food_detail/snacks?foodId=${food.id}") },
+                name = stringResource(R.string.piece),
+                foods = day.snacks,
+                typeOfMeal = "snacks",
+                selectedDate = selectedDate,
+                onAddClick = { navController.navigate("food_detail/snacks") },
+                onEditClick = { food -> navController.navigate("food_detail/snacks?foodId=${food.id}") },
                 onDeleteClick = { food -> homeViewModel.deleteFood(food, day) }
             )
         }

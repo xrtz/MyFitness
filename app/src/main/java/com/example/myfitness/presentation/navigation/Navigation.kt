@@ -21,27 +21,27 @@ import com.example.myfitness.presentation.viewmodel.HomeViewModel
 
 @Composable
 fun Navigation(
-    modifier         : Modifier = Modifier,
-    viewModelFactory : ViewModelFactory,
-    onLogout         : () -> Unit = {}
+    modifier: Modifier = Modifier,
+    viewModelFactory: ViewModelFactory,
+    onLogout: () -> Unit = {}
 ) {
     val navController = rememberNavController()
     GlobalNavigation.navController = navController
 
-    val homeViewModel       : HomeViewModel       = viewModel(factory = viewModelFactory)
-    val foodDetailViewModel : FoodDetailViewModel = viewModel(factory = viewModelFactory)
+    val homeViewModel: HomeViewModel = viewModel(factory = viewModelFactory)
+    val foodDetailViewModel: FoodDetailViewModel = viewModel(factory = viewModelFactory)
 
     NavHost(
-        navController    = navController,
+        navController = navController,
         startDestination = "home"
     ) {
         composable(route = "home") {
             HomeScreen(
-                modifier         = modifier,
-                navController    = navController,
-                homeViewModel    = homeViewModel,
+                modifier = modifier,
+                navController = navController,
+                homeViewModel = homeViewModel,
                 viewModelFactory = viewModelFactory,
-                onLogout         = onLogout
+                onLogout = onLogout
             )
         }
 
@@ -50,20 +50,20 @@ fun Navigation(
             arguments = listOf(
                 navArgument("typeOfMeal") { type = NavType.StringType },
                 navArgument("foodId") {
-                    type         = NavType.IntType
+                    type = NavType.IntType
                     defaultValue = -1
                 }
             )
         ) { backStackEntry ->
             val typeOfMeal = backStackEntry.arguments?.getString("typeOfMeal") ?: "breakfast"
-            val foodId     = backStackEntry.arguments?.getInt("foodId").takeIf { it != -1 }
+            val foodId = backStackEntry.arguments?.getInt("foodId").takeIf { it != -1 }
 
             FoodDetailPage(
-                typeOfMeal          = typeOfMeal,
-                foodId              = foodId,
-                homeViewModel       = homeViewModel,
+                typeOfMeal = typeOfMeal,
+                foodId = foodId,
+                homeViewModel = homeViewModel,
                 foodDetailViewModel = foodDetailViewModel,
-                onBack              = { navController.popBackStack() }
+                onBack = { navController.popBackStack() }
             )
         }
     }

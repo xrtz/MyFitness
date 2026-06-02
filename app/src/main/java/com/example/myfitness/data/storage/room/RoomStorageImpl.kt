@@ -17,50 +17,52 @@ class RoomStorageImpl @Inject constructor(
     private fun currentUserKey() = TokenProvider.userId ?: ""
 
     override fun getDayFoodItems(date: DateModel): DayFoodItemModel {
-        val userKey   = currentUserKey()
+        val userKey = currentUserKey()
         val dayEntity = foodDao.getDayFood(date.day, userKey) ?: return emptyDay(date.day)
-        val allFood   = foodDao.getFoodByDay(dayEntity.id)
+        val allFood = foodDao.getFoodByDay(dayEntity.id)
 
         return DayFoodItemModel(
-            id            = dayEntity.id,
-            userId        = dayEntity.userId,
-            date          = dayEntity.date,
-            calories      = dayEntity.calories,
-            protein       = dayEntity.protein,
-            fats          = dayEntity.fats,
+            id = dayEntity.id,
+            userId = dayEntity.userId,
+            date = dayEntity.date,
+            calories = dayEntity.calories,
+            protein = dayEntity.protein,
+            fats = dayEntity.fats,
             carbohydrates = dayEntity.carbohydrates,
-            breakfast     = allFood.filter { it.typeOfMeal == "breakfast" }.map { it.toModel() },
-            lunch         = allFood.filter { it.typeOfMeal == "lunch"     }.map { it.toModel() },
-            dinner        = allFood.filter { it.typeOfMeal == "dinner"    }.map { it.toModel() },
-            snacks        = allFood.filter { it.typeOfMeal == "snacks"    }.map { it.toModel() }
+            breakfast = allFood.filter { it.typeOfMeal == "breakfast" }.map { it.toModel() },
+            lunch = allFood.filter { it.typeOfMeal == "lunch" }.map { it.toModel() },
+            dinner = allFood.filter { it.typeOfMeal == "dinner" }.map { it.toModel() },
+            snacks = allFood.filter { it.typeOfMeal == "snacks" }.map { it.toModel() }
         )
     }
 
-    override fun updateDayFoodItems(day: DayFoodItemModel) {
-        val userKey     = currentUserKey()
+    override fun updateDayFoodItems(day: DayFoodItemModel, isSynced: Boolean) {
+        val userKey = currentUserKey()
         val existingDay = foodDao.getDayFood(day.date, userKey)
 
         val resolvedDayId: Int = if (existingDay == null) {
             foodDao.insertOrUpdateDay(
                 DayFoodEntity(
-                    id            = 0,
-                    userId        = day.userId,
-                    userKey       = userKey,
-                    date          = day.date,
-                    calories      = day.calories,
-                    protein       = day.protein,
-                    fats          = day.fats,
-                    carbohydrates = day.carbohydrates
+                    id = 0,
+                    userId = day.userId,
+                    userKey = userKey,
+                    date = day.date,
+                    calories = day.calories,
+                    protein = day.protein,
+                    fats = day.fats,
+                    carbohydrates = day.carbohydrates,
+                    isSynced = isSynced
                 )
             ).toInt()
         } else {
             foodDao.insertOrUpdateDay(
                 existingDay.copy(
-                    calories      = day.calories,
-                    protein       = day.protein,
-                    fats          = day.fats,
+                    calories = day.calories,
+                    protein = day.protein,
+                    fats = day.fats,
                     carbohydrates = day.carbohydrates,
-                    userKey       = userKey
+                    userKey = userKey,
+                    isSynced = isSynced
                 )
             )
             existingDay.id
@@ -73,40 +75,58 @@ class RoomStorageImpl @Inject constructor(
         }
     }
 
+    override fun getUnsyncedDays(): List<DayFoodItemModel> =
+        foodDao.getUnsyncedDays().map { entity ->
+            val allFood = foodDao.getFoodByDay(entity.id)
+            DayFoodItemModel(
+                id = entity.id,
+                userId = entity.userId,
+                date = entity.date,
+                calories = entity.calories,
+                protein = entity.protein,
+                fats = entity.fats,
+                carbohydrates = entity.carbohydrates,
+                breakfast = allFood.filter { it.typeOfMeal == "breakfast" }.map { it.toModel() },
+                lunch = allFood.filter { it.typeOfMeal == "lunch" }.map { it.toModel() },
+                dinner = allFood.filter { it.typeOfMeal == "dinner" }.map { it.toModel() },
+                snacks = allFood.filter { it.typeOfMeal == "snacks" }.map { it.toModel() }
+            )
+        }
+
     private fun FoodEntity.toModel() = FoodModel(
-        id            = id,
-        name          = name,
-        weight        = weight,
-        calories      = calories,
-        typeOfMeal    = typeOfMeal,
-        protein       = protein,
-        fats          = fats,
+        id = id,
+        name = name,
+        weight = weight,
+        calories = calories,
+        typeOfMeal = typeOfMeal,
+        protein = protein,
+        fats = fats,
         carbohydrates = carbohydrates
     )
 
     private fun FoodModel.toEntity(dayId: Int, forceNewId: Boolean = false) = FoodEntity(
-        id            = if (forceNewId) 0 else id,
-        dayId         = dayId,
-        name          = name,
-        weight        = weight,
-        calories      = calories,
-        typeOfMeal    = typeOfMeal,
-        protein       = protein,
-        fats          = fats,
+        id = if (forceNewId) 0 else id,
+        dayId = dayId,
+        name = name,
+        weight = weight,
+        calories = calories,
+        typeOfMeal = typeOfMeal,
+        protein = protein,
+        fats = fats,
         carbohydrates = carbohydrates
     )
 
     private fun emptyDay(date: Int) = DayFoodItemModel(
-        id            = 0,
-        userId        = 0,
-        date          = date,
-        calories      = 0f,
-        protein       = 0f,
-        fats          = 0f,
+        id = 0,
+        userId = 0,
+        date = date,
+        calories = 0f,
+        protein = 0f,
+        fats = 0f,
         carbohydrates = 0f,
-        breakfast     = emptyList(),
-        lunch         = emptyList(),
-        dinner        = emptyList(),
-        snacks        = emptyList()
+        breakfast = emptyList(),
+        lunch = emptyList(),
+        dinner = emptyList(),
+        snacks = emptyList()
     )
 }

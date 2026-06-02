@@ -41,15 +41,15 @@ import com.example.myfitness.presentation.viewmodel.HomeViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodDetailPage(
-    typeOfMeal          : String,
-    foodId              : Int? = null,
-    homeViewModel       : HomeViewModel,
-    foodDetailViewModel : FoodDetailViewModel,
-    onBack              : () -> Unit
+    typeOfMeal: String,
+    foodId: Int? = null,
+    homeViewModel: HomeViewModel,
+    foodDetailViewModel: FoodDetailViewModel,
+    onBack: () -> Unit
 ) {
-    val detailState  by foodDetailViewModel.state.collectAsState()
+    val detailState by foodDetailViewModel.state.collectAsState()
     val selectedDate by homeViewModel.selectedDate.collectAsState()
-    val dayFoodItem  by homeViewModel.dayFoodItem.collectAsState()
+    val dayFoodItem by homeViewModel.dayFoodItem.collectAsState()
 
     LaunchedEffect(foodId) {
         if (foodId != null) {
@@ -71,10 +71,10 @@ fun FoodDetailPage(
 
     val mealTitle = when (typeOfMeal) {
         "breakfast" -> "Завтрак"
-        "lunch"     -> "Обед"
-        "dinner"    -> "Ужин"
-        "snacks"    -> "Перекус"
-        else        -> typeOfMeal
+        "lunch" -> "Обед"
+        "dinner" -> "Ужин"
+        "snacks" -> "Перекус"
+        else -> typeOfMeal
     }
 
     Scaffold(
@@ -83,13 +83,13 @@ fun FoodDetailPage(
                 title = {
                     Column {
                         Text(
-                            text       = mealTitle,
+                            text = mealTitle,
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            text     = selectedDate.toString(),
-                            style    = MaterialTheme.typography.labelSmall,
-                            color    = Color.White.copy(alpha = 0.8f)
+                            text = selectedDate.toString(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.8f)
                         )
                     }
                 },
@@ -99,8 +99,8 @@ fun FoodDetailPage(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor         = MaterialTheme.colorScheme.primary,
-                    titleContentColor      = Color.White,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White,
                     navigationIconContentColor = Color.White
                 )
             )
@@ -115,61 +115,61 @@ fun FoodDetailPage(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedTextField(
-                value         = detailState.name,
+                value = detailState.name,
                 onValueChange = foodDetailViewModel::onNameChange,
-                label         = { Text("Название продукта") },
-                modifier      = Modifier.fillMaxWidth(),
-                singleLine    = true,
-                shape         = RoundedCornerShape(12.dp)
+                label = { Text("Название продукта") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
             )
             OutlinedTextField(
-                value           = detailState.weight,
-                onValueChange   = foodDetailViewModel::onWeightChange,
-                label           = { Text("Вес (г)") },
+                value = detailState.weight,
+                onValueChange = foodDetailViewModel::onWeightChange,
+                label = { Text("Вес (г)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier        = Modifier.fillMaxWidth(),
-                singleLine      = true,
-                shape           = RoundedCornerShape(12.dp)
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
             )
             OutlinedTextField(
-                value           = detailState.calories,
-                onValueChange   = foodDetailViewModel::onCaloriesChange,
-                label           = { Text("Калории (ккал)") },
+                value = detailState.calories,
+                onValueChange = foodDetailViewModel::onCaloriesChange,
+                label = { Text("Калории (ккал)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier        = Modifier.fillMaxWidth(),
-                singleLine      = true,
-                shape           = RoundedCornerShape(12.dp)
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
             )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier              = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    value           = detailState.protein,
-                    onValueChange   = foodDetailViewModel::onProteinChange,
-                    label           = { Text("Белки (г)") },
+                    value = detailState.protein,
+                    onValueChange = foodDetailViewModel::onProteinChange,
+                    label = { Text("Белки (г)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier        = Modifier.weight(1f),
-                    singleLine      = true,
-                    shape           = RoundedCornerShape(12.dp)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
                 OutlinedTextField(
-                    value           = detailState.fats,
-                    onValueChange   = foodDetailViewModel::onFatsChange,
-                    label           = { Text("Жиры (г)") },
+                    value = detailState.fats,
+                    onValueChange = foodDetailViewModel::onFatsChange,
+                    label = { Text("Жиры (г)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier        = Modifier.weight(1f),
-                    singleLine      = true,
-                    shape           = RoundedCornerShape(12.dp)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
                 OutlinedTextField(
-                    value           = detailState.carbohydrates,
-                    onValueChange   = foodDetailViewModel::onCarbohydratesChange,
-                    label           = { Text("Углев. (г)") },
+                    value = detailState.carbohydrates,
+                    onValueChange = foodDetailViewModel::onCarbohydratesChange,
+                    label = { Text("Углев. (г)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier        = Modifier.weight(1f),
-                    singleLine      = true,
-                    shape           = RoundedCornerShape(12.dp)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
             }
 
@@ -182,18 +182,20 @@ fun FoodDetailPage(
                         foodDetailViewModel.save(
                             typeOfMeal = typeOfMeal,
                             currentDay = day,
-                            foodId     = foodId,
-                            onSaved    = homeViewModel::updateDayState
+                            foodId = foodId,
+                            onSaved = homeViewModel::updateDayState
                         )
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(50.dp),
-                shape    = RoundedCornerShape(12.dp),
-                enabled  = dayFoodItem != null
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(12.dp),
+                enabled = dayFoodItem != null
             ) {
                 Text(
-                    text       = if (foodId == null) "Добавить" else "Сохранить",
-                    fontSize   = 16.sp,
+                    text = if (foodId == null) "Добавить" else "Сохранить",
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
             }

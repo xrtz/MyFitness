@@ -4,19 +4,21 @@ import android.content.Context
 import android.content.SharedPreferences
 
 object TokenProvider {
-    @Volatile var token: String? = null
-    @Volatile var userId: String? = null
+    @Volatile
+    var token: String? = null
+    @Volatile
+    var userId: String? = null
 
     private var prefs: SharedPreferences? = null
 
     fun init(context: Context) {
         prefs = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
-        token  = prefs?.getString("jwt_token", null)
+        token = prefs?.getString("jwt_token", null)
         userId = prefs?.getString("user_id", null)
     }
 
     fun save(newToken: String, newUserId: String) {
-        token  = newToken
+        token = newToken
         userId = newUserId
         prefs?.edit()
             ?.putString("jwt_token", newToken)
@@ -25,7 +27,7 @@ object TokenProvider {
     }
 
     fun clear() {
-        token  = null
+        token = null
         userId = null
         prefs?.edit()
             ?.remove("jwt_token")

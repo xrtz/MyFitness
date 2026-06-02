@@ -9,16 +9,16 @@ class GetCaloriesGoalUseCase @Inject constructor(
 ) {
     suspend fun execute(): Float {
         val user = repository.getProfile()
-        val bmr  = Util.howMuchNeedCalories(
+        val bmr = Util.howMuchNeedCalories(
             weight = user.weight.coerceAtLeast(1f),
             height = user.height.coerceAtLeast(1f),
-            age    = 25,
+            age = 25,
             gender = user.gender
         )
         return when {
             user.target.contains("похудение", ignoreCase = true) -> bmr - 500f
-            user.target.contains("набор",     ignoreCase = true) -> bmr + 300f
-            else                                                  -> bmr
+            user.target.contains("набор", ignoreCase = true) -> bmr + 300f
+            else -> bmr
         }.coerceAtLeast(1200f)
     }
 }

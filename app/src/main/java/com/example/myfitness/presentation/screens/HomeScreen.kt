@@ -47,21 +47,21 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    modifier         : Modifier = Modifier,
-    navController    : NavController,
-    homeViewModel    : HomeViewModel,
-    viewModelFactory : ViewModelFactory,
-    onLogout         : () -> Unit = {}
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    homeViewModel: HomeViewModel,
+    viewModelFactory: ViewModelFactory,
+    onLogout: () -> Unit = {}
 ) {
     val navItemList = listOf(
-        NavItem(stringResource(R.string.label_nav_home),    Icons.Default.Home),
+        NavItem(stringResource(R.string.label_nav_home), Icons.Default.Home),
         NavItem(stringResource(R.string.label_nav_profile), Icons.Default.AccountCircle)
     )
 
-    var selectedBar    by rememberSaveable { mutableStateOf(0) }
+    var selectedBar by rememberSaveable { mutableStateOf(0) }
     var showDatePicker by remember { mutableStateOf(false) }
 
-    val selectedDate  by homeViewModel.selectedDate.collectAsState()
+    val selectedDate by homeViewModel.selectedDate.collectAsState()
     val dateFormatter = remember { DateTimeFormatter.ofPattern("EEE, d MMMM", Locale("ru")) }
 
     Scaffold(
@@ -70,10 +70,10 @@ fun HomeScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text       = selectedDate.format(dateFormatter)
+                            text = selectedDate.format(dateFormatter)
                                 .replaceFirstChar { it.uppercase() },
                             fontWeight = FontWeight.SemiBold,
-                            fontSize   = 18.sp
+                            fontSize = 18.sp
                         )
                     },
                     actions = {
@@ -82,7 +82,7 @@ fun HomeScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor    = MaterialTheme.colorScheme.surface,
+                        containerColor = MaterialTheme.colorScheme.surface,
                         titleContentColor = MaterialTheme.colorScheme.onSurface
                     )
                 )
@@ -96,9 +96,9 @@ fun HomeScreen(
                 navItemList.forEachIndexed { index, navItem ->
                     NavigationBarItem(
                         selected = index == selectedBar,
-                        onClick  = { selectedBar = index },
-                        icon     = { Icon(navItem.icon, contentDescription = navItem.label) },
-                        label    = { Text(navItem.label, fontSize = 11.sp) }
+                        onClick = { selectedBar = index },
+                        icon = { Icon(navItem.icon, contentDescription = navItem.label) },
+                        label = { Text(navItem.label, fontSize = 11.sp) }
                     )
                 }
             }
@@ -106,24 +106,25 @@ fun HomeScreen(
     ) { innerPadding ->
         when (selectedBar) {
             0 -> HomePage(
-                modifier      = modifier.padding(innerPadding),
+                modifier = modifier.padding(innerPadding),
                 navController = navController,
                 homeViewModel = homeViewModel
             )
+
             1 -> ProfilePage(
-                modifier         = modifier.padding(innerPadding),
+                modifier = modifier.padding(innerPadding),
                 viewModelFactory = viewModelFactory,
-                onSaved          = { homeViewModel.loadUserGoal() },
-                onLogout         = onLogout
+                onSaved = { homeViewModel.loadUserGoal() },
+                onLogout = onLogout
             )
         }
     }
 
     if (showDatePicker) {
         DatePickerModal(
-            initialDate    = selectedDate,
+            initialDate = selectedDate,
             onDateSelected = { homeViewModel.selectDate(it) },
-            onDismiss      = { showDatePicker = false }
+            onDismiss = { showDatePicker = false }
         )
     }
 }
@@ -131,16 +132,16 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DatePickerModal(
-    initialDate    : LocalDate,
-    onDateSelected : (LocalDate) -> Unit,
-    onDismiss      : () -> Unit
+    initialDate: LocalDate,
+    onDateSelected: (LocalDate) -> Unit,
+    onDismiss: () -> Unit
 ) {
-    val initialMillis   = initialDate.toEpochDay() * 86_400_000L
+    val initialMillis = initialDate.toEpochDay() * 86_400_000L
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialMillis
     )
 
-    val context   = LocalContext.current
+    val context = LocalContext.current
     val ruContext = remember(context) {
         val config = Configuration(context.resources.configuration)
         config.setLocale(java.util.Locale("ru"))

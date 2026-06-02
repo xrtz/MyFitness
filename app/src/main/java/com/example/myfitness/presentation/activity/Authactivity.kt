@@ -35,9 +35,9 @@ class AuthActivity : ComponentActivity() {
             MyFitnessTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AuthScreen(
-                        modifier         = Modifier.padding(innerPadding),
+                        modifier = Modifier.padding(innerPadding),
                         viewModelFactory = viewModelFactory,
-                        onAuthSuccess    = { goToMain() }
+                        onAuthSuccess = { goToMain() }
                     )
                 }
             }

@@ -34,31 +34,33 @@ private const val PAGER_CENTER = 500
 @Composable
 fun WeekView(viewModel: HomeViewModel) {
     val selectedDate by viewModel.selectedDate.collectAsState()
-    val today        = remember { LocalDate.now() }
+    val today = remember { LocalDate.now() }
     val todayWeekStart = remember { viewModel.getStartOfWeek(today) }
 
     val pagerState = rememberPagerState(
         initialPage = PAGER_CENTER,
-        pageCount   = { PAGER_CENTER * 2 }
+        pageCount = { PAGER_CENTER * 2 }
     )
 
     HorizontalPager(
-        state    = pagerState,
+        state = pagerState,
         modifier = Modifier.fillMaxWidth()
     ) { page ->
-        val weekOffset    = (page - PAGER_CENTER).toLong()
+        val weekOffset = (page - PAGER_CENTER).toLong()
         val currentWeekStart = todayWeekStart.plusWeeks(weekOffset)
 
         Row(
-            modifier              = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             for (i in 0..6) {
                 val date = currentWeekStart.plusDays(i.toLong())
                 DayItem(
-                    date       = date,
+                    date = date,
                     isSelected = date == selectedDate,
-                    onClick    = { viewModel.selectDate(date) }
+                    onClick = { viewModel.selectDate(date) }
                 )
             }
         }
@@ -67,26 +69,26 @@ fun WeekView(viewModel: HomeViewModel) {
 
 @Composable
 fun DayItem(
-    date       : LocalDate,
-    isSelected : Boolean,
-    onClick    : () -> Unit
+    date: LocalDate,
+    isSelected: Boolean,
+    onClick: () -> Unit
 ) {
-    val today   = remember { LocalDate.now() }
+    val today = remember { LocalDate.now() }
     val isToday = date == today
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier            = Modifier
+        modifier = Modifier
             .clickable { onClick() }
             .padding(4.dp)
     ) {
         Text(
-            text       = date.dayOfWeek.name.take(2),
-            fontSize   = 11.sp,
+            text = date.dayOfWeek.name.take(2),
+            fontSize = 11.sp,
             fontWeight = FontWeight.Medium,
-            color      = when {
+            color = when {
                 isToday -> MaterialTheme.colorScheme.primary
-                else    -> MaterialTheme.colorScheme.outline
+                else -> MaterialTheme.colorScheme.outline
             }
         )
 
@@ -94,25 +96,25 @@ fun DayItem(
 
         Box(
             contentAlignment = Alignment.Center,
-            modifier         = Modifier
+            modifier = Modifier
                 .size(38.dp)
                 .background(
                     color = when {
                         isSelected -> MaterialTheme.colorScheme.primary
-                        isToday    -> MaterialTheme.colorScheme.primaryContainer
-                        else       -> Color.Transparent
+                        isToday -> MaterialTheme.colorScheme.primaryContainer
+                        else -> Color.Transparent
                     },
                     shape = CircleShape
                 )
         ) {
             Text(
-                text       = date.dayOfMonth.toString(),
-                fontSize   = 14.sp,
+                text = date.dayOfMonth.toString(),
+                fontSize = 14.sp,
                 fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
-                color      = when {
+                color = when {
                     isSelected -> Color.White
-                    isToday    -> MaterialTheme.colorScheme.primary
-                    else       -> MaterialTheme.colorScheme.onBackground
+                    isToday -> MaterialTheme.colorScheme.primary
+                    else -> MaterialTheme.colorScheme.onBackground
                 }
             )
         }

@@ -51,21 +51,21 @@ import com.example.myfitness.presentation.viewmodel.AuthViewModel
 
 @Composable
 fun AuthScreen(
-    modifier         : Modifier = Modifier,
-    viewModelFactory : ViewModelFactory,
-    onAuthSuccess    : () -> Unit
+    modifier: Modifier = Modifier,
+    viewModelFactory: ViewModelFactory,
+    onAuthSuccess: () -> Unit
 ) {
     val authViewModel: AuthViewModel = viewModel(factory = viewModelFactory)
     val state by authViewModel.state.collectAsState()
 
     var isLoginMode by remember { mutableStateOf(true) }
-    var email    by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var name     by remember { mutableStateOf("") }
-    var weight   by remember { mutableStateOf("") }
-    var height   by remember { mutableStateOf("") }
-    var gender   by remember { mutableStateOf(1) }
-    var target   by remember { mutableStateOf("maintain") }
+    var name by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
+    var height by remember { mutableStateOf("") }
+    var gender by remember { mutableStateOf(1) }
+    var target by remember { mutableStateOf("maintain") }
 
     LaunchedEffect(state) {
         if (state is AuthState.Success) {
@@ -87,147 +87,147 @@ fun AuthScreen(
 
         // ── Логотип ───────────────────────────────────────────
         Box(
-            modifier         = Modifier
+            modifier = Modifier
                 .size(80.dp)
                 .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector        = Icons.Default.Favorite,
+                imageVector = Icons.Default.Favorite,
                 contentDescription = null,
-                tint               = MaterialTheme.colorScheme.primary,
-                modifier           = Modifier.size(40.dp)
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(40.dp)
             )
         }
 
         Spacer(Modifier.height(16.dp))
 
         Text(
-            text       = "MyFitness",
-            fontSize   = 34.sp,
+            text = "MyFitness",
+            fontSize = 34.sp,
             fontWeight = FontWeight.Bold,
-            color      = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary
         )
         Text(
-            text     = "Твой трекер питания",
+            text = "Твой трекер питания",
             fontSize = 14.sp,
-            color    = MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.outline
         )
 
         Spacer(Modifier.height(32.dp))
 
         // ── Форма ─────────────────────────────────────────────
         Surface(
-            modifier      = Modifier.fillMaxWidth(),
-            shape         = RoundedCornerShape(20.dp),
-            color         = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            color = MaterialTheme.colorScheme.surface,
             shadowElevation = 4.dp
         ) {
             Column(
-                modifier            = Modifier.padding(20.dp),
+                modifier = Modifier.padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text       = if (isLoginMode) "Вход" else "Регистрация",
-                    fontSize   = 20.sp,
+                    text = if (isLoginMode) "Вход" else "Регистрация",
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color      = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 OutlinedTextField(
-                    value           = email,
-                    onValueChange   = { email = it },
-                    label           = { Text("Email") },
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    modifier        = Modifier.fillMaxWidth(),
-                    singleLine      = true,
-                    shape           = RoundedCornerShape(12.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
 
                 OutlinedTextField(
-                    value                = password,
-                    onValueChange        = { password = it },
-                    label                = { Text("Пароль") },
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Пароль") },
                     visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions      = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier             = Modifier.fillMaxWidth(),
-                    singleLine           = true,
-                    shape                = RoundedCornerShape(12.dp)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
 
                 AnimatedVisibility(visible = !isLoginMode) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         OutlinedTextField(
-                            value         = name,
+                            value = name,
                             onValueChange = { name = it },
-                            label         = { Text("Имя") },
-                            modifier      = Modifier.fillMaxWidth(),
-                            singleLine    = true,
-                            shape         = RoundedCornerShape(12.dp)
+                            label = { Text("Имя") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
                         )
 
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier              = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             OutlinedTextField(
-                                value           = weight,
-                                onValueChange   = { weight = it },
-                                label           = { Text("Вес (кг)") },
+                                value = weight,
+                                onValueChange = { weight = it },
+                                label = { Text("Вес (кг)") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                modifier        = Modifier.weight(1f),
-                                singleLine      = true,
-                                shape           = RoundedCornerShape(12.dp)
+                                modifier = Modifier.weight(1f),
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp)
                             )
                             OutlinedTextField(
-                                value           = height,
-                                onValueChange   = { height = it },
-                                label           = { Text("Рост (см)") },
+                                value = height,
+                                onValueChange = { height = it },
+                                label = { Text("Рост (см)") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                modifier        = Modifier.weight(1f),
-                                singleLine      = true,
-                                shape           = RoundedCornerShape(12.dp)
+                                modifier = Modifier.weight(1f),
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp)
                             )
                         }
 
                         Text(
-                            text       = "Пол",
+                            text = "Пол",
                             fontWeight = FontWeight.Medium,
-                            color      = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             FilterChip(
                                 selected = gender == 1,
-                                onClick  = { gender = 1 },
-                                label    = { Text("Мужской") }
+                                onClick = { gender = 1 },
+                                label = { Text("Мужской") }
                             )
                             FilterChip(
                                 selected = gender == 0,
-                                onClick  = { gender = 0 },
-                                label    = { Text("Женский") }
+                                onClick = { gender = 0 },
+                                label = { Text("Женский") }
                             )
                         }
 
                         Text(
-                            text       = "Цель",
+                            text = "Цель",
                             fontWeight = FontWeight.Medium,
-                            color      = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             FilterChip(
                                 selected = target == "lose",
-                                onClick  = { target = "lose" },
-                                label    = { Text("Похудение") }
+                                onClick = { target = "lose" },
+                                label = { Text("Похудение") }
                             )
                             FilterChip(
                                 selected = target == "maintain",
-                                onClick  = { target = "maintain" },
-                                label    = { Text("Поддержание") }
+                                onClick = { target = "maintain" },
+                                label = { Text("Поддержание") }
                             )
                             FilterChip(
                                 selected = target == "gain",
-                                onClick  = { target = "gain" },
-                                label    = { Text("Набор") }
+                                onClick = { target = "gain" },
+                                label = { Text("Набор") }
                             )
                         }
                     }
@@ -246,37 +246,39 @@ fun AuthScreen(
                                 authViewModel.login(email, password)
                             } else {
                                 authViewModel.register(
-                                    email    = email,
+                                    email = email,
                                     password = password,
-                                    name     = name,
-                                    weight   = weight,
-                                    height   = height,
-                                    gender   = gender,
-                                    target   = target
+                                    name = name,
+                                    weight = weight,
+                                    height = height,
+                                    gender = gender,
+                                    target = target
                                 )
                             }
                         },
-                        modifier = Modifier.fillMaxWidth().height(50.dp),
-                        shape    = RoundedCornerShape(12.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text       = if (isLoginMode) "Войти" else "Зарегистрироваться",
-                            fontSize   = 16.sp,
+                            text = if (isLoginMode) "Войти" else "Зарегистрироваться",
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
                 }
 
                 TextButton(
-                    onClick  = {
+                    onClick = {
                         isLoginMode = !isLoginMode
                         authViewModel.resetState()
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text  = if (isLoginMode) "Нет аккаунта? Зарегистрироваться"
-                                else "Уже есть аккаунт? Войти",
+                        text = if (isLoginMode) "Нет аккаунта? Зарегистрироваться"
+                        else "Уже есть аккаунт? Войти",
                         color = MaterialTheme.colorScheme.primary
                     )
                 }

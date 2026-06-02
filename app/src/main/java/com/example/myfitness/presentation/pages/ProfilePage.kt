@@ -49,10 +49,10 @@ private val TARGET_OPTIONS = listOf("похудение", "поддержани�
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfilePage(
-    modifier         : Modifier = Modifier,
-    viewModelFactory : ViewModelFactory,
-    onSaved          : () -> Unit = {},
-    onLogout         : () -> Unit = {}
+    modifier: Modifier = Modifier,
+    viewModelFactory: ViewModelFactory,
+    onSaved: () -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
     val viewModel: ProfileViewModel = viewModel(factory = viewModelFactory)
     val state by viewModel.state.collectAsState()
@@ -71,73 +71,73 @@ fun ProfilePage(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text       = "Профиль",
-            fontSize   = 26.sp,
+            text = "Профиль",
+            fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            color      = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         // ── Основная информация ───────────────────────────────
         SectionLabel("Основное")
 
         OutlinedTextField(
-            value         = state.name,
+            value = state.name,
             onValueChange = viewModel::onNameChange,
-            label         = { Text("Имя") },
-            modifier      = Modifier.fillMaxWidth(),
-            shape         = RoundedCornerShape(12.dp)
+            label = { Text("Имя") },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
         )
 
         OutlinedTextField(
-            value           = state.email,
-            onValueChange   = viewModel::onEmailChange,
-            label           = { Text("Email") },
+            value = state.email,
+            onValueChange = viewModel::onEmailChange,
+            label = { Text("Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier        = Modifier.fillMaxWidth(),
-            shape           = RoundedCornerShape(12.dp)
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
         )
 
         // ── Параметры тела ────────────────────────────────────
         SectionLabel("Параметры тела")
 
         Text(
-            text       = "Пол",
+            text = "Пол",
             fontWeight = FontWeight.Medium,
-            color      = MaterialTheme.colorScheme.onSurface,
-            fontSize   = 14.sp
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 14.sp
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(
                 selected = state.gender == "1",
-                onClick  = { viewModel.onGenderChange("1") },
-                label    = { Text("Мужской") }
+                onClick = { viewModel.onGenderChange("1") },
+                label = { Text("Мужской") }
             )
             FilterChip(
                 selected = state.gender == "0",
-                onClick  = { viewModel.onGenderChange("0") },
-                label    = { Text("Женский") }
+                onClick = { viewModel.onGenderChange("0") },
+                label = { Text("Женский") }
             )
         }
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier              = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
-                value           = state.weight,
-                onValueChange   = viewModel::onWeightChange,
-                label           = { Text("Вес (кг)") },
+                value = state.weight,
+                onValueChange = viewModel::onWeightChange,
+                label = { Text("Вес (кг)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier        = Modifier.weight(1f),
-                shape           = RoundedCornerShape(12.dp)
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
             )
             OutlinedTextField(
-                value           = state.height,
-                onValueChange   = viewModel::onHeightChange,
-                label           = { Text("Рост (см)") },
+                value = state.height,
+                onValueChange = viewModel::onHeightChange,
+                label = { Text("Рост (см)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier        = Modifier.weight(1f),
-                shape           = RoundedCornerShape(12.dp)
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
             )
         }
 
@@ -145,28 +145,28 @@ fun ProfilePage(
         SectionLabel("Цель")
 
         ExposedDropdownMenuBox(
-            expanded         = targetExpanded,
+            expanded = targetExpanded,
             onExpandedChange = { targetExpanded = it },
-            modifier         = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
-                value         = state.target.ifEmpty { "Выберите цель" },
+                value = state.target.ifEmpty { "Выберите цель" },
                 onValueChange = {},
-                readOnly      = true,
-                label         = { Text("Цель") },
-                trailingIcon  = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = targetExpanded) },
-                modifier      = Modifier
+                readOnly = true,
+                label = { Text("Цель") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = targetExpanded) },
+                modifier = Modifier
                     .fillMaxWidth()
                     .menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
-                shape         = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp)
             )
             ExposedDropdownMenu(
-                expanded         = targetExpanded,
+                expanded = targetExpanded,
                 onDismissRequest = { targetExpanded = false }
             ) {
                 TARGET_OPTIONS.forEach { option ->
                     DropdownMenuItem(
-                        text    = { Text(option) },
+                        text = { Text(option) },
                         onClick = {
                             viewModel.onTargetChange(option)
                             targetExpanded = false
@@ -181,17 +181,19 @@ fun ProfilePage(
         if (state.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                color    = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary
             )
         } else {
             Button(
-                onClick  = viewModel::save,
-                modifier = Modifier.fillMaxWidth().height(50.dp),
-                shape    = RoundedCornerShape(12.dp)
+                onClick = viewModel::save,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text       = "Сохранить",
-                    fontSize   = 16.sp,
+                    text = "Сохранить",
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -205,16 +207,18 @@ fun ProfilePage(
         Spacer(modifier = Modifier.height(4.dp))
 
         OutlinedButton(
-            onClick  = onLogout,
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            shape    = RoundedCornerShape(12.dp),
-            colors   = ButtonDefaults.outlinedButtonColors(
+            onClick = onLogout,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = MaterialTheme.colorScheme.error
             )
         ) {
             Text(
-                text       = "Выйти из аккаунта",
-                fontSize   = 16.sp,
+                text = "Выйти из аккаунта",
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -225,16 +229,16 @@ fun ProfilePage(
 private fun SectionLabel(text: String) {
     Column {
         Text(
-            text       = text,
-            fontSize   = 12.sp,
+            text = text,
+            fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
-            color      = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.primary,
             letterSpacing = 0.8.sp
         )
         HorizontalDivider(
-            modifier  = Modifier.padding(top = 2.dp),
+            modifier = Modifier.padding(top = 2.dp),
             thickness = 1.dp,
-            color     = MaterialTheme.colorScheme.outlineVariant
+            color = MaterialTheme.colorScheme.outlineVariant
         )
     }
 }

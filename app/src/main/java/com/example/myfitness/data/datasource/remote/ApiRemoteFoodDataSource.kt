@@ -23,47 +23,47 @@ class ApiRemoteFoodDataSource @Inject constructor(
     }
 
     private fun DayFoodResponse.toDomain(epochDay: Int) = DayFoodItemModel(
-        id            = id.toInt(),
-        userId        = 0,
-        date          = epochDay,
-        calories      = calories,
-        protein       = protein,
-        fats          = fats,
+        id = id.toInt(),
+        userId = 0,
+        date = epochDay,
+        calories = calories,
+        protein = protein,
+        fats = fats,
         carbohydrates = carbohydrates,
-        breakfast     = breakfast.map { it.toDomain() },
-        lunch         = lunch.map     { it.toDomain() },
-        dinner        = dinner.map    { it.toDomain() },
-        snacks        = snacks.map    { it.toDomain() }
+        breakfast = breakfast.map { it.toDomain() },
+        lunch = lunch.map { it.toDomain() },
+        dinner = dinner.map { it.toDomain() },
+        snacks = snacks.map { it.toDomain() }
     )
 
     private fun FoodItemDto.toDomain() = FoodModel(
-        id            = id.toInt(),
-        name          = name,
-        weight        = weight,
-        calories      = calories,
-        typeOfMeal    = typeOfMeal,
-        protein       = protein,
-        fats          = fats,
+        id = id.toInt(),
+        name = name,
+        weight = weight,
+        calories = calories,
+        typeOfMeal = typeOfMeal,
+        protein = protein,
+        fats = fats,
         carbohydrates = carbohydrates
     )
 
     private fun DayFoodItemModel.toRequest() = DayFoodRequest(
-        date          = date,
-        calories      = calories,
-        protein       = protein,
-        fats          = fats,
+        date = date,
+        calories = calories,
+        protein = protein,
+        fats = fats,
         carbohydrates = carbohydrates,
-        foodItems     = (breakfast + lunch + dinner + snacks).map { it.toDto() }
+        foodItems = (breakfast + lunch + dinner + snacks).map { it.toDto() }
     )
 
     private fun FoodModel.toDto() = FoodItemDto(
-        id            = id.toLong(),
-        name          = name,
-        weight        = weight,
-        calories      = calories,
-        typeOfMeal    = typeOfMeal,
-        protein       = protein,
-        fats          = fats,
+        id = id.toLong(),
+        name = name,
+        weight = weight,
+        calories = calories,
+        typeOfMeal = typeOfMeal,
+        protein = protein,
+        fats = fats,
         carbohydrates = carbohydrates
     )
 }

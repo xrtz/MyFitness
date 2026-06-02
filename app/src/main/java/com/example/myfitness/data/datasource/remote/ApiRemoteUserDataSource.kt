@@ -22,13 +22,13 @@ class ApiRemoteUserDataSource @Inject constructor(
     }
 
     override suspend fun register(
-        name     : String,
-        email    : String,
-        password : String,
-        gender   : Int,
-        weight   : Float,
-        height   : Float,
-        target   : String
+        name: String,
+        email: String,
+        password: String,
+        gender: Int,
+        weight: Float,
+        height: Float,
+        target: String
     ): Pair<String, String> {
         val response = apiService.register(
             RegisterRequest(name, email, password, gender, weight, height, target)
@@ -49,9 +49,9 @@ class ApiRemoteUserDataSource @Inject constructor(
     override suspend fun updateProfile(user: UserModel): UserModel {
         val response = apiService.updateMe(
             UserRequest(
-                name   = user.name,
+                name = user.name,
                 gender = user.gender,
-                email  = user.gmail,
+                email = user.gmail,
                 weight = user.weight,
                 height = user.height,
                 target = user.target
@@ -62,10 +62,10 @@ class ApiRemoteUserDataSource @Inject constructor(
     }
 
     private fun UserResponse.toDomain() = UserModel(
-        id     = 0,
-        name   = name,
+        id = 0,
+        name = name,
         gender = gender,
-        gmail  = email,
+        gmail = email,
         weight = weight,
         height = height,
         target = target

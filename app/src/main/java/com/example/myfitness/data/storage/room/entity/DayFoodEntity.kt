@@ -12,5 +12,6 @@ data class DayFoodEntity(
     val calories: Float,
     val protein: Float,
     val fats: Float,
-    val carbohydrates: Float
+    val carbohydrates: Float,
+    val isSynced: Boolean = false
 )

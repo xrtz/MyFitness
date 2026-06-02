@@ -8,7 +8,11 @@ class StorageImpl : Storage {
         TODO("Not yet implemented")
     }
 
-    override fun updateDayFoodItems(day: DayFoodItemModel) {
+    override fun updateDayFoodItems(day: DayFoodItemModel, isSynced: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getUnsyncedDays(): List<DayFoodItemModel> {
         TODO("Not yet implemented")
     }
 }

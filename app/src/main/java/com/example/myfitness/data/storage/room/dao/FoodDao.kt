@@ -40,4 +40,7 @@ interface FoodDao {
 
     @Query("DELETE FROM food_items WHERE dayId = :dayId")
     fun deleteAllFoodByDayId(dayId: Int)
+
+    @Query("SELECT * FROM day_food WHERE isSynced = 0")
+    fun getUnsyncedDays(): List<DayFoodEntity>
 }

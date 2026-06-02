@@ -33,34 +33,53 @@ import com.example.myfitness.domain.models.DayFoodItemModel
 @Composable
 fun DayInfoView(dayFoodItem: DayFoodItemModel, caloriesGoal: Float) {
     val proteinGoal = caloriesGoal * 0.30f / 4f
-    val fatsGoal    = caloriesGoal * 0.25f / 9f
-    val carbsGoal   = caloriesGoal * 0.45f / 4f
+    val fatsGoal = caloriesGoal * 0.25f / 9f
+    val carbsGoal = caloriesGoal * 0.45f / 4f
 
     Card(
-        modifier  = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(2.dp),
-        colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
-            modifier            = Modifier.fillMaxWidth().padding(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CaloriesCircle(consumed = dayFoodItem.calories, goal = caloriesGoal)
 
             HorizontalDivider(
-                modifier  = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier.padding(horizontal = 8.dp),
                 thickness = 1.dp,
-                color     = MaterialTheme.colorScheme.outlineVariant
+                color = MaterialTheme.colorScheme.outlineVariant
             )
 
             Column(
-                modifier            = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                MacroBar(label = "Белки",  current = dayFoodItem.protein,       goal = proteinGoal, color = Color(0xFF60A5FA))
-                MacroBar(label = "Жиры",   current = dayFoodItem.fats,          goal = fatsGoal,    color = Color(0xFFFB923C))
-                MacroBar(label = "Углев.", current = dayFoodItem.carbohydrates, goal = carbsGoal,   color = Color(0xFF4ADE80))
+                MacroBar(
+                    label = "Белки",
+                    current = dayFoodItem.protein,
+                    goal = proteinGoal,
+                    color = Color(0xFF60A5FA)
+                )
+                MacroBar(
+                    label = "Жиры",
+                    current = dayFoodItem.fats,
+                    goal = fatsGoal,
+                    color = Color(0xFFFB923C)
+                )
+                MacroBar(
+                    label = "Углев.",
+                    current = dayFoodItem.carbohydrates,
+                    goal = carbsGoal,
+                    color = Color(0xFF4ADE80)
+                )
             }
         }
     }
@@ -68,51 +87,52 @@ fun DayInfoView(dayFoodItem: DayFoodItemModel, caloriesGoal: Float) {
 
 @Composable
 private fun CaloriesCircle(consumed: Float, goal: Float) {
-    val safeGoal    = goal.coerceAtLeast(1f)
-    val progress    = (consumed / safeGoal).coerceIn(0f, 1f)
-    val isOver      = consumed > goal
-    val arcColor    = if (isOver) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-    val trackColor  = MaterialTheme.colorScheme.primaryContainer
+    val safeGoal = goal.coerceAtLeast(1f)
+    val progress = (consumed / safeGoal).coerceIn(0f, 1f)
+    val isOver = consumed > goal
+    val arcColor =
+        if (isOver) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    val trackColor = MaterialTheme.colorScheme.primaryContainer
 
     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(200.dp)) {
         Canvas(modifier = Modifier.size(200.dp)) {
             val stroke = Stroke(width = 18.dp.toPx(), cap = StrokeCap.Round)
             drawArc(
-                color      = trackColor,
+                color = trackColor,
                 startAngle = 135f,
                 sweepAngle = 270f,
-                useCenter  = false,
-                style      = stroke
+                useCenter = false,
+                style = stroke
             )
             if (progress > 0f) {
                 drawArc(
-                    color      = arcColor,
+                    color = arcColor,
                     startAngle = 135f,
                     sweepAngle = 270f * progress,
-                    useCenter  = false,
-                    style      = stroke
+                    useCenter = false,
+                    style = stroke
                 )
             }
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text       = consumed.toInt().toString(),
-                fontSize   = 42.sp,
+                text = consumed.toInt().toString(),
+                fontSize = 42.sp,
                 fontWeight = FontWeight.Bold,
-                color      = if (isOver) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                color = if (isOver) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text       = "ккал",
-                fontSize   = 14.sp,
-                color      = MaterialTheme.colorScheme.outline,
+                text = "ккал",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.outline,
                 fontWeight = FontWeight.Medium
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text     = "из ${goal.toInt()}",
+                text = "из ${goal.toInt()}",
                 fontSize = 12.sp,
-                color    = MaterialTheme.colorScheme.outline
+                color = MaterialTheme.colorScheme.outline
             )
         }
     }
@@ -123,31 +143,31 @@ private fun MacroBar(label: String, current: Float, goal: Float, color: Color) {
     val progress = (current / goal.coerceAtLeast(1f)).coerceIn(0f, 1f)
 
     Row(
-        modifier          = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text       = label,
-            modifier   = Modifier.width(52.dp),
-            fontSize   = 13.sp,
+            text = label,
+            modifier = Modifier.width(52.dp),
+            fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
-            color      = color
+            color = color
         )
         Spacer(Modifier.width(8.dp))
         LinearProgressIndicator(
-            progress   = { progress },
-            modifier   = Modifier
+            progress = { progress },
+            modifier = Modifier
                 .weight(1f)
                 .height(10.dp)
                 .clip(RoundedCornerShape(5.dp)),
-            color      = color,
+            color = color,
             trackColor = color.copy(alpha = 0.15f)
         )
         Spacer(Modifier.width(8.dp))
         Text(
-            text     = "${current.toInt()}/${goal.toInt()}г",
+            text = "${current.toInt()}/${goal.toInt()}г",
             fontSize = 12.sp,
-            color    = MaterialTheme.colorScheme.outline,
+            color = MaterialTheme.colorScheme.outline,
             modifier = Modifier.width(80.dp)
         )
     }

@@ -10,15 +10,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 sealed class AuthState {
-    object Idle    : AuthState()
+    object Idle : AuthState()
     object Loading : AuthState()
     object Success : AuthState()
     data class Error(val message: String) : AuthState()
 }
 
 class AuthViewModel(
-    private val loginUseCase    : LoginUseCase,
-    private val registerUseCase : RegisterUseCase
+    private val loginUseCase: LoginUseCase,
+    private val registerUseCase: RegisterUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -38,6 +38,7 @@ class AuthViewModel(
                 val msg = when {
                     e.message?.contains("401") == true || e.message?.contains("404") == true ->
                         "Неверный email или пароль"
+
                     else -> e.message ?: "Ошибка подключения"
                 }
                 _state.value = AuthState.Error(msg)
@@ -46,13 +47,13 @@ class AuthViewModel(
     }
 
     fun register(
-        email    : String,
-        password : String,
-        name     : String,
-        weight   : String,
-        height   : String,
-        gender   : Int,
-        target   : String
+        email: String,
+        password: String,
+        name: String,
+        weight: String,
+        height: String,
+        gender: Int,
+        target: String
     ) {
         if (email.isBlank() || password.isBlank() || name.isBlank()) {
             _state.value = AuthState.Error("Заполните обязательные поля")
@@ -62,13 +63,13 @@ class AuthViewModel(
             _state.value = AuthState.Loading
             try {
                 registerUseCase.execute(
-                    name     = name,
-                    email    = email,
+                    name = name,
+                    email = email,
                     password = password,
-                    gender   = gender,
-                    weight   = weight.toFloatOrNull() ?: 0f,
-                    height   = height.toFloatOrNull() ?: 0f,
-                    target   = target
+                    gender = gender,
+                    weight = weight.toFloatOrNull() ?: 0f,
+                    height = height.toFloatOrNull() ?: 0f,
+                    target = target
                 )
                 _state.value = AuthState.Success
             } catch (e: Exception) {
