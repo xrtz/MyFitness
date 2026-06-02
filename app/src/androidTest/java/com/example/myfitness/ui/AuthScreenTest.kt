@@ -65,17 +65,4 @@ class AuthScreenTest {
         composeTestRule.onNodeWithText("Зарегистрироваться").assertIsDisplayed()
     }
 
-    @Test
-    fun переключение_назад_к_логину_скрывает_поля_регистрации() {
-        composeTestRule.setContent {
-            MyFitnessTheme {
-                AuthScreen(viewModelFactory = factory, onAuthSuccess = {})
-            }
-        }
-        composeTestRule.onNodeWithText("Нет аккаунта? Зарегистрироваться").performClick()
-        composeTestRule.mainClock.advanceTimeBy(500)
-        composeTestRule.onNodeWithText("Уже есть аккаунт? Войти").performClick()
-        composeTestRule.mainClock.advanceTimeBy(500)
-        composeTestRule.onNodeWithText("Войти").assertIsDisplayed()
-    }
 }

@@ -23,6 +23,4 @@ object Util {
         }
         return (bmr * activityLevel).toFloat()
     }
-
-    fun whatDayToday(): LocalDate = LocalDate.now()
 }

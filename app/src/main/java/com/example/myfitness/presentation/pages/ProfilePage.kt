@@ -77,8 +77,8 @@ fun ProfilePage(
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        // ── Основная информация ───────────────────────────────
-        SectionLabel("Основное")
+
+        SectionLabel("Основная информация")
 
         OutlinedTextField(
             value = state.name,
@@ -97,7 +97,6 @@ fun ProfilePage(
             shape = RoundedCornerShape(12.dp)
         )
 
-        // ── Параметры тела ────────────────────────────────────
         SectionLabel("Параметры тела")
 
         Text(
@@ -141,8 +140,7 @@ fun ProfilePage(
             )
         }
 
-        // ── Цель ─────────────────────────────────────────────
-        SectionLabel("Цель")
+        SectionLabel("Цель ")
 
         ExposedDropdownMenuBox(
             expanded = targetExpanded,
