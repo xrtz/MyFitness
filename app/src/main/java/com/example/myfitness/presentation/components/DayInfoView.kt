@@ -1,5 +1,8 @@
 package com.example.myfitness.presentation.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +22,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -94,6 +98,12 @@ private fun CaloriesCircle(consumed: Float, goal: Float) {
         if (isOver) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     val trackColor = MaterialTheme.colorScheme.primaryContainer
 
+    val animatedProgress by animateFloatAsState(
+        targetValue = progress,
+        animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+        label = "caloriesProgress"
+    )
+
     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(200.dp)) {
         Canvas(modifier = Modifier.size(200.dp)) {
             val stroke = Stroke(width = 18.dp.toPx(), cap = StrokeCap.Round)
@@ -104,11 +114,11 @@ private fun CaloriesCircle(consumed: Float, goal: Float) {
                 useCenter = false,
                 style = stroke
             )
-            if (progress > 0f) {
+            if (animatedProgress > 0f) {
                 drawArc(
                     color = arcColor,
                     startAngle = 135f,
-                    sweepAngle = 270f * progress,
+                    sweepAngle = 270f * animatedProgress,
                     useCenter = false,
                     style = stroke
                 )
@@ -141,6 +151,11 @@ private fun CaloriesCircle(consumed: Float, goal: Float) {
 @Composable
 private fun MacroBar(label: String, current: Float, goal: Float, color: Color) {
     val progress = (current / goal.coerceAtLeast(1f)).coerceIn(0f, 1f)
+    val animatedProgress by animateFloatAsState(
+        targetValue = progress,
+        animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),
+        label = "macroProgress_$label"
+    )
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -155,7 +170,7 @@ private fun MacroBar(label: String, current: Float, goal: Float, color: Color) {
         )
         Spacer(Modifier.width(8.dp))
         LinearProgressIndicator(
-            progress = { progress },
+            progress = { animatedProgress },
             modifier = Modifier
                 .weight(1f)
                 .height(10.dp)

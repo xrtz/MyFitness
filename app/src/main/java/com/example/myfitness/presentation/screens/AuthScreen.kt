@@ -84,7 +84,7 @@ fun AuthScreen(
     ) {
         Spacer(Modifier.height(48.dp))
 
-        // ── Логотип ───────────────────────────────────────────
+
         Box(
             modifier = Modifier
                 .size(80.dp)
@@ -115,7 +115,6 @@ fun AuthScreen(
 
         Spacer(Modifier.height(32.dp))
 
-        // ── Форма ─────────────────────────────────────────────
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),

@@ -25,14 +25,11 @@ class FoodRepositoryImpl @Inject constructor(
 
     override suspend fun loadDayFromServer(epochDay: Int): DayFoodItemModel? {
         return try {
+            val isLocalSynced = withContext(Dispatchers.IO) { storage.isDaySynced(epochDay) }
+            if (!isLocalSynced) return null
             val day = remoteDataSource.getDay(epochDay)
             day?.let {
-                withContext(Dispatchers.IO) {
-                    storage.updateDayFoodItems(
-                        it,
-                        isSynced = true
-                    )
-                }
+                withContext(Dispatchers.IO) { storage.updateDayFoodItems(it, isSynced = true) }
             }
             day
         } catch (_: Exception) {

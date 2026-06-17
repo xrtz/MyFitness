@@ -7,4 +7,5 @@ interface Storage {
     fun getDayFoodItems(date: DateModel): DayFoodItemModel
     fun updateDayFoodItems(day: DayFoodItemModel, isSynced: Boolean = false)
     fun getUnsyncedDays(): List<DayFoodItemModel>
+    fun isDaySynced(epochDay: Int): Boolean
 }

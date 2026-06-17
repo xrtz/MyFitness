@@ -7,6 +7,7 @@ import com.example.myfitness.domain.models.FoodModel
 import com.example.myfitness.domain.usecase.AddFoodItemUseCase
 import com.example.myfitness.domain.usecase.ChangeFoodItemUseCase
 import com.example.myfitness.domain.usecase.SyncDayUseCase
+import com.example.myfitness.presentation.model.FoodPreset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,7 +20,11 @@ data class FoodDetailState(
     val fats: String = "",
     val carbohydrates: String = "",
     val isSaved: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val presetCaloriesPer100g: Int? = null,
+    val presetProteinPer100g: Float? = null,
+    val presetFatsPer100g: Float? = null,
+    val presetCarbsPer100g: Float? = null,
 )
 
 class FoodDetailViewModel(
@@ -37,6 +42,45 @@ class FoodDetailViewModel(
 
     fun onWeightChange(v: String) {
         _state.value = _state.value.copy(weight = v, error = null)
+        recalculateFromPreset()
+    }
+
+    fun selectPreset(preset: FoodPreset) {
+        val currentWeight = _state.value.weight.takeIf { it.isNotBlank() } ?: "100"
+        _state.value = _state.value.copy(
+            name = preset.name,
+            weight = currentWeight,
+            presetCaloriesPer100g = preset.caloriesPer100g,
+            presetProteinPer100g = preset.proteinPer100g,
+            presetFatsPer100g = preset.fatsPer100g,
+            presetCarbsPer100g = preset.carbsPer100g,
+            error = null
+        )
+        recalculateFromPreset()
+    }
+
+    fun selectFromHistory(food: FoodModel) {
+        _state.value = FoodDetailState(
+            name = food.name,
+            weight = food.weight.toString(),
+            calories = food.calories.toString(),
+            protein = food.protein.toString(),
+            fats = food.fats.toString(),
+            carbohydrates = food.carbohydrates.toString()
+        )
+    }
+
+    private fun recalculateFromPreset() {
+        val s = _state.value
+        val weight = s.weight.toFloatOrNull() ?: return
+        val calPer100 = s.presetCaloriesPer100g ?: return
+        val factor = weight / 100f
+        _state.value = s.copy(
+            calories = (calPer100 * factor).toInt().toString(),
+            protein = "%.1f".format((s.presetProteinPer100g ?: 0f) * factor),
+            fats = "%.1f".format((s.presetFatsPer100g ?: 0f) * factor),
+            carbohydrates = "%.1f".format((s.presetCarbsPer100g ?: 0f) * factor)
+        )
     }
 
     fun onCaloriesChange(v: String) {

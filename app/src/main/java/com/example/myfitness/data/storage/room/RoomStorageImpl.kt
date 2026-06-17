@@ -75,6 +75,11 @@ class RoomStorageImpl @Inject constructor(
         }
     }
 
+    override fun isDaySynced(epochDay: Int): Boolean {
+        val userKey = currentUserKey()
+        return foodDao.isDaySynced(epochDay, userKey) ?: true
+    }
+
     override fun getUnsyncedDays(): List<DayFoodItemModel> =
         foodDao.getUnsyncedDays().map { entity ->
             val allFood = foodDao.getFoodByDay(entity.id)

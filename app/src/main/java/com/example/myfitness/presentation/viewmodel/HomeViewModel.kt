@@ -44,7 +44,10 @@ class HomeViewModel(
     private var loadJob: Job? = null
 
     init {
-        loadDay(LocalDate.now())
+        viewModelScope.launch {
+            try { syncPendingDaysUseCase.execute() } catch (_: Exception) {}
+            loadDay(LocalDate.now())
+        }
         loadUserGoal()
     }
 

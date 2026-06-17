@@ -43,4 +43,7 @@ interface FoodDao {
 
     @Query("SELECT * FROM day_food WHERE isSynced = 0")
     fun getUnsyncedDays(): List<DayFoodEntity>
+
+    @Query("SELECT isSynced FROM day_food WHERE date = :date AND userKey = :userKey LIMIT 1")
+    fun isDaySynced(date: Int, userKey: String): Boolean?
 }
