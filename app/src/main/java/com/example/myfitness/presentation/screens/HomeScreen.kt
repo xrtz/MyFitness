@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myfitness.R
 import com.example.myfitness.di.ViewModelFactory
+import com.example.myfitness.presentation.components.DessertRouletteDialog
 import com.example.myfitness.presentation.pages.HomePage
 import com.example.myfitness.presentation.pages.ProfilePage
 import com.example.myfitness.presentation.viewmodel.HomeViewModel
@@ -60,6 +61,7 @@ fun HomeScreen(
 
     var selectedBar by rememberSaveable { mutableStateOf(0) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showDessertRoulette by remember { mutableStateOf(false) }
 
     val selectedDate by homeViewModel.selectedDate.collectAsState()
     val dateFormatter = remember { DateTimeFormatter.ofPattern("EEE, d MMMM", Locale("ru")) }
@@ -77,6 +79,9 @@ fun HomeScreen(
                         )
                     },
                     actions = {
+                        IconButton(onClick = { showDessertRoulette = true }) {
+                            Text(text = "🎰", fontSize = 22.sp)
+                        }
                         IconButton(onClick = { showDatePicker = true }) {
                             Text(text = "📅", fontSize = 22.sp)
                         }
@@ -126,6 +131,10 @@ fun HomeScreen(
             onDateSelected = { homeViewModel.selectDate(it) },
             onDismiss = { showDatePicker = false }
         )
+    }
+
+    if (showDessertRoulette) {
+        DessertRouletteDialog(onDismiss = { showDessertRoulette = false })
     }
 }
 
